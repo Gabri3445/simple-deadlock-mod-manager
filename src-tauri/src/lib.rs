@@ -2,8 +2,6 @@
 
 mod commands;
 
-const DEADLOCK_APP_ID: u32 = 1422450;
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
