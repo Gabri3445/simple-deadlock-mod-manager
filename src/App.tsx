@@ -1,5 +1,5 @@
 import "./style.css";
-import Button from "./components/Button.tsx";
+import TopBar from "./components/TopBar/TopBar.tsx";
 
 function App() {
 
@@ -10,14 +10,7 @@ function App() {
 
     return (
         <main className="flex h-screen flex-col">
-            <div className="w-full bg-sky-400 p-4 flex justify-between">
-                <h1 className="text-3xl block">Deadlock Mod Manager</h1>
-                <div className="flex gap-4">
-                    <Button>Load Mod</Button>
-                    <Button>Select game path</Button>
-                    <Button>Options</Button>
-                </div>
-            </div>
+            <TopBar/>
             <div className="flex flex-1">
                 <div className="flex-1 bg-red-500">Unloaded</div>
                 <div className="flex-1 bg-red-500">Loaded</div>
