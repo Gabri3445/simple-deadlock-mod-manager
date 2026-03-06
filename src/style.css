@@ -14,8 +14,16 @@
     src: url("./fonts/retaildemo-regular.otf") format("opentype");
 }
 
+@font-face {
+    font-family: "Retail Demo";
+    font-style: normal;
+    font-weight: 700;
+    src: url("./fonts/retaildemo-bold.otf") format("opentype");
+}
+
 @theme {
     --color-cream: #A6977B;
-    --font-sans: "Black Han Sans", sans-serif;
-    --font-retail-demo: "Retail Demo", sans-serif;
+    --color-darker-cream: #736855;
+    --color-topbar: #5CA9B9;
+    --font-sans: "Retail Demo", sans-serif;
 }
