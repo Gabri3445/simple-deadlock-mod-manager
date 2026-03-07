@@ -11,8 +11,8 @@ function ModTab({variant}: { variant: ModTabVariant }) {
             <div className="border-3 h-full border-t-0 border-darker-cream">
                 <div
                     className="bg-darker-cream text-white h-8.75 leading-8.75 pl-2">{variant === ModTabVariant.LoadedMods ? "Loaded Mods" : "Unloaded Mods"}</div>
-                <div className="px-2 pt-2 grid grid-cols-4 gap-2">
-                    <Mod modName={"Monster Rounds"}/>
+                <div className="px-2 pt-2 grid grid-cols-3 gap-2">
+                    <Mod modName={"Testing"}/>
                     <Mod modName={"Testing"}/>
                     <Mod modName={"Testing"}/>
                     <Mod modName={"Testing"}/>
