@@ -3,32 +3,43 @@
 use crate::config::ModManagerConfig;
 use std::env::home_dir;
 use std::fs::{create_dir_all, read_to_string, write};
+use std::path::PathBuf;
 use std::sync::Mutex;
 use tauri::Manager;
 
 mod commands;
 mod config;
 
+struct ConfigState {
+    path: PathBuf,
+    config: Mutex<ModManagerConfig>,
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            let path = home_dir().unwrap().join(".config/dmm/config.json");
-            println!("{}", path.display());
+            let path = home_dir()
+                .ok_or("Unable to locate home directory")?
+                .join(".config/dmm/config.json");
             if path.exists() {
-                let contents = read_to_string(path).unwrap();
+                let contents = read_to_string(&path)?;
                 let config = serde_json::from_str::<ModManagerConfig>(&contents)?;
-                app.manage(Mutex::new(config));
+                app.manage(ConfigState {
+                    path,
+                    config: Mutex::new(config),
+                });
                 return Ok(());
             }
             if let Some(parent) = path.parent() {
                 create_dir_all(parent)?;
             }
-            write(
+            let default_config = ModManagerConfig::default();
+            write(&path, serde_json::to_string_pretty(&default_config)?)?;
+            app.manage(ConfigState {
                 path,
-                serde_json::to_string_pretty(&ModManagerConfig::default())?,
-            )?;
-            app.manage(Mutex::new(ModManagerConfig::default()));
+                config: Mutex::new(default_config),
+            });
             Ok(())
         })
         .plugin(tauri_plugin_dialog::init())
