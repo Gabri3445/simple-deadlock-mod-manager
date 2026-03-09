@@ -15,14 +15,20 @@ pub struct ConfigState {
     pub config: Mutex<ModManagerConfig>,
 }
 
-pub fn save_config(config_state: &ConfigState) -> Result<(), Box<dyn std::error::Error + '_>> {
+pub fn save_config(
+    config_state: &ConfigState,
+) -> Result<ModManagerConfig, Box<dyn std::error::Error + '_>> {
     let config = config_state.config.lock()?;
+    if let Some(parent) = config_state.path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
     let json = serde_json::to_string_pretty(&*config)?;
     std::fs::write(&config_state.path, json)?;
-    Ok(())
+    Ok(config.clone())
 }
 
 pub fn load_config() -> Result<ModManagerConfig, Box<dyn std::error::Error>> {
+    //add versioning
     let path = home_dir()
         .ok_or("Unable to locate home directory")?
         .join(CONFIG_PATH);
