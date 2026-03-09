@@ -1,6 +1,41 @@
 use serde::{Deserialize, Serialize};
+use std::env::home_dir;
+use std::path::PathBuf;
+use std::sync::Mutex;
 
-#[derive(Default, Deserialize, Serialize)]
+pub const CONFIG_PATH: &str = ".config/dmm/config.json";
+
+#[derive(Default, Deserialize, Serialize, Clone)]
 pub struct ModManagerConfig {
-    deadlock_path: String,
+    pub deadlock_path: String,
+}
+
+pub struct ConfigState {
+    pub path: PathBuf,
+    pub config: Mutex<ModManagerConfig>,
+}
+
+pub fn save_config(config_state: &ConfigState) -> Result<(), Box<dyn std::error::Error + '_>> {
+    let config = config_state.config.lock()?;
+    let json = serde_json::to_string_pretty(&*config)?;
+    std::fs::write(&config_state.path, json)?;
+    Ok(())
+}
+
+pub fn load_config() -> Result<ModManagerConfig, Box<dyn std::error::Error>> {
+    let path = home_dir()
+        .ok_or("Unable to locate home directory")?
+        .join(CONFIG_PATH);
+    if !path.exists() {
+        let default_config = ModManagerConfig::default();
+        save_config(&ConfigState {
+            path,
+            config: Mutex::new(default_config.clone()),
+        })
+        .expect("Failed to save default config");
+        return Ok(default_config);
+    }
+    let contents = std::fs::read_to_string(&path)?;
+    let config = serde_json::from_str::<ModManagerConfig>(&contents)?;
+    Ok(config)
 }
