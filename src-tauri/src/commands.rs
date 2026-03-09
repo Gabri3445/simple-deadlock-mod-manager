@@ -1,7 +1,8 @@
 // Command registry for Deadlock Mod Manager
 // This module contains all Tauri commands organized in a maintainable way
 
-use crate::config::{ConfigState, ModManagerConfig};
+use crate::config::{save_config, ConfigState, ModManagerConfig};
+use std::sync::Mutex;
 use tauri::State;
 
 const DEADLOCK_APP_ID: u32 = 1422450;
@@ -29,5 +30,10 @@ pub fn load_config_command(state: State<ConfigState>) -> Result<ModManagerConfig
 pub fn change_path(path: String, state: State<ConfigState>) -> Result<String, String> {
     let mut config = state.config.lock().unwrap();
     config.deadlock_path = path.clone();
+    save_config(&ConfigState {
+        path: state.path.clone(),
+        config: Mutex::new(config.clone()),
+    })
+    .map_err(|e| e.to_string())?;
     Ok(path)
 }
