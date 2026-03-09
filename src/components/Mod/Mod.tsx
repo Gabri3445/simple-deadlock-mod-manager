@@ -11,7 +11,7 @@ function Mod({modName}: { modName: string }) {
     const [color] = useState(colors[Math.floor(Math.random() * colors.length)]);
 
     return (
-        <div className={`${color} h-20 flex items-center justify-center text-black font-bold`}>
+        <div className={`${color} h-20 flex items-center justify-center text-black font-bold rounded-lg`}>
             {isEditing ? (
                 <input
                     value={value}
