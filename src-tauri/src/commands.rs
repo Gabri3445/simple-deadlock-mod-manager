@@ -1,6 +1,9 @@
 // Command registry for Deadlock Mod Manager
 // This module contains all Tauri commands organized in a maintainable way
 
+use crate::config::{ConfigState, ModManagerConfig};
+use tauri::State;
+
 const DEADLOCK_APP_ID: u32 = 1422450;
 
 /// Get the path to the Deadlock game installation directory
@@ -15,4 +18,9 @@ pub fn get_deadlock_path() -> Result<String, String> {
         Ok(None) => Err("Deadlock not found".to_string()),
         Err(e) => Err(format!("Failed to find Steam app: {}", e)),
     }
+}
+
+#[tauri::command]
+pub fn load_config_command(state: State<ConfigState>) -> Result<ModManagerConfig, String> {
+    Ok(state.config.lock().unwrap().clone())
 }
