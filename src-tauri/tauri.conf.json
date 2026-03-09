@@ -39,7 +39,7 @@
       "includePatterns": null,
       "includePrivate": false,
       "outputPath": "./src/generated",
-      "projectPath": "./src-tauri",
+      "projectPath": ".",
       "typeMappings": null,
       "validationLibrary": "zod",
       "verbose": false,
