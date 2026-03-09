@@ -24,10 +24,10 @@ pub fn run() {
         })
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        // This macro automatically discovers all #[tauri::command] functions from imported modules
         .invoke_handler(tauri::generate_handler![
             commands::get_deadlock_path,
-            commands::load_config_command
+            commands::load_config_command,
+            commands::change_path,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
