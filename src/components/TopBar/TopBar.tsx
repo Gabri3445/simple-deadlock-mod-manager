@@ -7,6 +7,7 @@ import {useState} from "react";
 function TopBar() {
 
     const onLoadModClick = async (): Promise<void> => {
+        // @ts-ignore
         const file = await open({
             multiple: true,
             directory: false,
