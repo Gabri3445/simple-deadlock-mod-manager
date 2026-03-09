@@ -22,5 +22,12 @@ pub fn get_deadlock_path() -> Result<String, String> {
 
 #[tauri::command]
 pub fn load_config_command(state: State<ConfigState>) -> Result<ModManagerConfig, String> {
-    Ok(state.config.lock().unwrap().clone())
+    Ok(state.config.lock().map_err(|e| e.to_string())?.clone())
+}
+
+#[tauri::command]
+pub fn change_path(path: String, state: State<ConfigState>) -> Result<String, String> {
+    let mut config = state.config.lock().unwrap();
+    config.deadlock_path = path.clone();
+    Ok(path)
 }
