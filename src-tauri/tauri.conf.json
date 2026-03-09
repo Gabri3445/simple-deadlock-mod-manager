@@ -38,7 +38,7 @@
       "force": false,
       "includePatterns": null,
       "includePrivate": false,
-      "outputPath": "./src/generated",
+      "outputPath": "../src/generated",
       "projectPath": ".",
       "typeMappings": null,
       "validationLibrary": "zod",
