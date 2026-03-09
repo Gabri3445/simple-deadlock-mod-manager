@@ -17,8 +17,11 @@ pub struct ConfigState {
 
 pub fn save_config(
     config_state: &ConfigState,
-) -> Result<ModManagerConfig, Box<dyn std::error::Error + '_>> {
-    let config = config_state.config.lock()?;
+) -> Result<ModManagerConfig, Box<dyn std::error::Error>> {
+    let config = config_state
+        .config
+        .lock()
+        .map_err(|_| "couldn't acquire config lock")?;
     if let Some(parent) = config_state.path.parent() {
         std::fs::create_dir_all(parent)?;
     }
@@ -37,8 +40,7 @@ pub fn load_config() -> Result<ModManagerConfig, Box<dyn std::error::Error>> {
         save_config(&ConfigState {
             path,
             config: Mutex::new(default_config.clone()),
-        })
-        .expect("Failed to save default config");
+        })?;
         return Ok(default_config);
     }
     let contents = std::fs::read_to_string(&path)?;
