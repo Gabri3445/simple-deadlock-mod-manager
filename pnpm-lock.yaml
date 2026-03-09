@@ -41,6 +41,9 @@ importers:
       tailwindcss:
         specifier: ^4.2.1
         version: 4.2.1
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
     devDependencies:
       '@tauri-apps/cli':
         specifier: ^2
@@ -1238,6 +1241,9 @@ packages:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
 
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+
 snapshots:
 
   '@babel/code-frame@7.29.0':
@@ -2230,3 +2236,5 @@ snapshots:
   yallist@3.1.1: {}
 
   yaml@1.10.2: {}
+
+  zod@4.3.6: {}
