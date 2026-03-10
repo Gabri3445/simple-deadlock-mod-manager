@@ -6,16 +6,27 @@ import {changePath, getDeadlockPath, loadConfigCommand} from "../../generated";
 function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
     const [path, setPath] = useState("");
     useEffect(() => {
-        loadConfigCommand().then(r => setPath(r.deadlock_path));
+        loadConfigCommand({
+            onSuccess: (r) => setPath(r.deadlock_path),
+            onInvokeError: (r) => console.error(r)
+        }).then();
     }, [])
 
     const onApply = async () => {
-        await changePath({path: path});
-        onClose();
+        try {
+            await changePath({path: path});
+            onClose();
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     const onAutoDetectClick = async () => {
-        setPath(await getDeadlockPath());
+        try {
+            setPath(await getDeadlockPath());
+        } catch (e) {
+            console.error(e)
+        }
     }
     return (
         <Modal onClose={onClose} open={isOpen}>
