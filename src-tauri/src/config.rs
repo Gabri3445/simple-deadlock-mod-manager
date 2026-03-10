@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::env::home_dir;
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -8,13 +9,7 @@ pub const CONFIG_PATH: &str = ".config/dmm/config.json";
 #[derive(Default, Deserialize, Serialize, Clone)]
 pub struct ModManagerConfig {
     pub deadlock_path: String,
-    pub mod_names: Vec<ModName>,
-}
-
-#[derive(Default, Deserialize, Serialize, Clone)]
-pub struct ModName {
-    pub file_name: String,
-    pub user_name: String,
+    pub mod_names: HashMap<String, String>,
 }
 
 pub struct ConfigState {
