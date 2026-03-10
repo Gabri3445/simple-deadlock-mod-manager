@@ -14,7 +14,15 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
     const [validConfig, setValidConfig] = useState<boolean>(false);
     useEffect(() => {
         getConfig({
-            onSuccess: (r) => setPath(r.deadlock_path),
+            onSuccess: (r) => {
+                if (r.deadlock_path === "") {
+                    getAutoDetectDeadlockPath({
+                        onSuccess: (p) => setPath(p),
+                    }).then()
+                } else {
+                    setPath(r.deadlock_path);
+                }
+            },
             onInvokeError: (r) => console.error(r)
         }).then();
         checkGameinfoValidity({

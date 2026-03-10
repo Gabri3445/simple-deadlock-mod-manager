@@ -43,7 +43,6 @@ const FILESYSTEM_BLOCK_CONTENTS: &str = r#"FileSystem
 /// Get the path to the Deadlock game installation directory
 #[tauri::command]
 pub fn get_auto_detect_deadlock_path() -> Result<String, String> {
-    //TODO: should probably set it when it is blank in the config
     let steam_dir = steamlocate::SteamDir::locate().map_err(|e| e.to_string())?;
     match steam_dir.find_app(DEADLOCK_APP_ID) {
         Ok(Some((deadlock, library))) => {
