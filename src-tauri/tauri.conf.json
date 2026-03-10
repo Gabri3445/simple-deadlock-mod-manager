@@ -15,8 +15,8 @@
     ]
   },
   "build": {
-    "beforeBuildCommand": "pnpm build",
-    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "rimraf src/generated & pnpm build",
+    "beforeDevCommand": "rimraf src/generated & pnpm dev",
     "devUrl": "http://localhost:1420",
     "frontendDist": "../dist"
   },
