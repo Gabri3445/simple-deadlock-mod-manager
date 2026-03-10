@@ -38,11 +38,12 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
                                 Options
                             </div>
                             <div className="mt-8 text-xl">
-                                <label className="block mb-2">
+                                <label className="block mb-2" htmlFor="pathInput">
                                     Deadlock Path
                                 </label>
                                 <div className="flex">
-                                    <div className="bg-gray-800 grow mr-20"><input value={path} onChange={(e) => {
+                                    <div className="bg-gray-800 grow mr-20"><input id="pathInput" value={path}
+                                                                                   onChange={(e) => {
                                         setPath(e.target.value)
                                     }} className="text-lg m-1 w-full mr-1"/>
                                     </div>
