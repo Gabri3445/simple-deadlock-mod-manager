@@ -1,6 +1,3 @@
-// Command registry for Deadlock Mod Manager
-// This module contains all Tauri commands organized in a maintainable way
-
 use crate::config::{save_config, ConfigState, ModManagerConfig};
 use regex::Regex;
 use std::path::PathBuf;
@@ -40,10 +37,11 @@ pub fn change_path(path: String, state: State<ConfigState>) -> Result<String, St
     Ok(path)
 }
 
+//TODO: temp function for testing, this should either return two lists for loaded and unloaded mods or have two different functions
 #[tauri::command]
 pub fn list_mods(state: State<ConfigState>) -> Result<Vec<String>, String> {
     let config = state.config.lock().map_err(|e| e.to_string())?;
-    let mod_path = PathBuf::from(config.deadlock_path.clone())
+    let mod_path = PathBuf::from(config.deadlock_path.clone()) //TODO: make sure to create the addons directory if it does not exist
         .join("game")
         .join("citadel")
         .join("addons");
