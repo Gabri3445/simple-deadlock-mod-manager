@@ -90,6 +90,9 @@ pub fn list_mods(state: State<ConfigState>) -> Result<Mods, String> {
     let mut result: Mods = Mods::default();
     {
         let mut config = state.config.lock().map_err(|e| e.to_string())?;
+        if config.deadlock_path == "" {
+            return Err("Deadlock path not set".to_string());
+        }
         let mod_path = PathBuf::from(config.deadlock_path.clone())
             .join("game")
             .join("citadel")
