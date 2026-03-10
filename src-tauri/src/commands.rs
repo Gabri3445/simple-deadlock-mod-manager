@@ -6,6 +6,39 @@ use tauri::State;
 
 const DEADLOCK_APP_ID: u32 = 1422450;
 
+const FILESYSTEM_BLOCK_CONTENTS: &str = r#"FileSystem
+{
+	//
+	// The code that loads this file automatically does a few things here:
+	//
+	// 1. For each "Game" search path, it adds a "GameBin" path, in <dir>\bin
+	// 2. For each "Game" search path, it adds another "Game" path in front of it with _<language> at the end.
+	//    For example: c:\hl2\cstrike on a french machine would get a c:\hl2\cstrike_french path added to it.
+	// 3. If no "Mod" key, for the first "Game" search path, it adds a search path called "MOD".
+	// 4. If no "Write" key, for the first "Game" search path, it adds a search path called "DEFAULT_WRITE_PATH".
+	//
+
+	//
+	// Search paths are relative to the exe directory\..\
+	//
+	SearchPaths
+	{
+		// These are optional language paths. They must be mounted first, which is why there are first in the list.
+		// *LANGUAGE* will be replaced with the actual language name. If not running a specific language, these paths will not be mounted
+		Game_Language		citadel_*LANGUAGE*
+
+		Mod                 citadel
+		Write               citadel
+		Game                citadel/addons
+		Game                citadel
+		Mod                 core
+		Write               core
+		Game                core
+		AddonRoot           citadel_addons
+		OfficialAddonRoot   citadel_community_addons
+	}
+}"#;
+
 /// Get the path to the Deadlock game installation directory
 #[tauri::command]
 pub fn get_deadlock_path() -> Result<String, String> {
@@ -57,4 +90,68 @@ pub fn list_mods(state: State<ConfigState>) -> Result<Vec<String>, String> {
         }
     }
     Ok(result)
+}
+
+#[tauri::command]
+pub fn check_gameinfo_validity(state: State<ConfigState>) -> Result<bool, String> {
+    let config = state.config.lock().map_err(|e| e.to_string())?;
+    let gameinfo_path = PathBuf::from(config.deadlock_path.clone())
+        .join("game")
+        .join("citadel")
+        .join("gameinfo.gi");
+    if gameinfo_path.is_file() {
+        let contents = std::fs::read_to_string(&gameinfo_path).map_err(|e| e.to_string())?;
+        return Ok(contents.contains(FILESYSTEM_BLOCK_CONTENTS));
+    }
+    Err(format!(
+        "Gameinfo file does not exist at: {:?}",
+        gameinfo_path
+    ))
+}
+
+#[tauri::command]
+pub fn make_config_valid(state: State<ConfigState>) -> Result<(), String> {
+    let config = state.config.lock().map_err(|e| e.to_string())?;
+    let gameinfo_path = PathBuf::from(config.deadlock_path.clone())
+        .join("game")
+        .join("citadel")
+        .join("gameinfo.gi");
+    if gameinfo_path.is_file() {
+        let contents = std::fs::read_to_string(&gameinfo_path).map_err(|e| e.to_string())?;
+
+        if let Some(start_idx) = contents.find("FileSystem") {
+            // Count braces to find the end of the block
+            let mut brace_count = 0;
+            let mut in_block = false;
+            let mut end_idx = start_idx;
+
+            for (i, c) in contents[start_idx..].char_indices() {
+                if c == '{' {
+                    brace_count += 1;
+                    in_block = true;
+                } else if c == '}' {
+                    brace_count -= 1;
+                }
+
+                if in_block && brace_count == 0 {
+                    end_idx = start_idx + i + 1;
+                    break;
+                }
+            }
+
+            // Replace the block
+            let mut new_contents = String::new();
+            new_contents.push_str(&contents[..start_idx]);
+            new_contents.push_str(FILESYSTEM_BLOCK_CONTENTS);
+            new_contents.push_str(&contents[end_idx..]);
+
+            std::fs::write(gameinfo_path, new_contents).map_err(|e| e.to_string())?;
+            return Ok(());
+        }
+        return Err("Gameinfo file does not contain filesystem".to_string());
+    }
+    Err(format!(
+        "Gameinfo file does not exist at: {:?}",
+        gameinfo_path
+    ))
 }

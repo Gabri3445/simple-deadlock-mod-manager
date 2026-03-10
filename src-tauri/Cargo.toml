@@ -27,4 +27,5 @@ steamlocate = "2.0.1"
 valve_pak = "0.1.0"
 tauri-plugin-dialog = "2"
 regex = "1.12.3"
+memchr = "2.8.0"
 

@@ -1,14 +1,18 @@
 import {Modal} from "@mui/material";
 import Button from "../Button/Button.tsx";
 import {useEffect, useState} from "react";
-import {changePath, getDeadlockPath, loadConfigCommand} from "../../generated";
+import {changePath, checkGameinfoValidity, getDeadlockPath, loadConfigCommand, makeConfigValid} from "../../generated";
 
 function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
     const [path, setPath] = useState("");
+    const [validConfig, setValidConfig] = useState<boolean>(false);
     useEffect(() => {
         loadConfigCommand({
             onSuccess: (r) => setPath(r.deadlock_path),
             onInvokeError: (r) => console.error(r)
+        }).then();
+        checkGameinfoValidity({
+            onSuccess: (r) => setValidConfig(r),
         }).then();
     }, [])
 
@@ -50,6 +54,27 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
                                     <Button onClick={onAutoDetectClick}>
                                         Auto-Detect
                                     </Button>
+                                </div>
+                            </div>
+                            <div className="mt-8 text-xl">
+                                <label className="block mb-2">gameinfo.gi file status</label>
+                                <div className="flex gap-2">
+                                    <div
+                                        className={`bg-gray-800 grow ${validConfig ? "bg-green-500" : "bg-red-500"}`}>{validConfig ? "Valid" : "Not valid"}</div>
+                                    <Button onClick={() => {
+                                        checkGameinfoValidity({
+                                            onSuccess: (r) => setValidConfig(r),
+                                        }).then();
+                                    }}>Check Validity</Button>
+                                    <Button onClick={() => {
+                                        makeConfigValid({
+                                            onSuccess: () => {
+                                                checkGameinfoValidity({
+                                                    onSuccess: (r) => setValidConfig(r),
+                                                }).then()
+                                            }
+                                        }).then()
+                                    }}>Make valid</Button>
                                 </div>
                             </div>
                         </div>
