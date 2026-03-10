@@ -5,17 +5,16 @@ use std::sync::Mutex;
 
 pub const CONFIG_PATH: &str = ".config/dmm/config.json";
 
-/*
-TODO: store the mod names in the config
-{
-"pak01_dir.vpk": "custom loaded mod name",
-"***pak01_dir.vpk": "custom unloaded mod name",
-...
-}
- */
 #[derive(Default, Deserialize, Serialize, Clone)]
 pub struct ModManagerConfig {
     pub deadlock_path: String,
+    pub mod_names: Vec<ModName>,
+}
+
+#[derive(Default, Deserialize, Serialize, Clone)]
+pub struct ModName {
+    pub file_name: String,
+    pub user_name: String,
 }
 
 pub struct ConfigState {

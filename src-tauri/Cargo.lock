@@ -812,7 +812,7 @@ dependencies = [
 name = "deadlock-mod-manager"
 version = "0.1.0"
 dependencies = [
-    "memchr",
+ "memchr",
  "regex",
  "serde",
  "serde_json",
