@@ -30,8 +30,7 @@ pub fn load_config_command(state: State<ConfigState>) -> Result<ModManagerConfig
 
 #[tauri::command]
 pub fn change_path(path: String, state: State<ConfigState>) -> Result<String, String> {
-    //TODO:: replace unwrap with ?
-    let mut config = state.config.lock().unwrap();
+    let mut config = state.config.lock().map_err(|e| e.to_string())?;
     config.deadlock_path = path.clone();
     save_config(&ConfigState {
         path: state.path.clone(),
@@ -43,8 +42,7 @@ pub fn change_path(path: String, state: State<ConfigState>) -> Result<String, St
 
 #[tauri::command]
 pub fn list_mods(state: State<ConfigState>) -> Result<Vec<String>, String> {
-    //TODO:: replace unwrap with ?
-    let config = state.config.lock().unwrap();
+    let config = state.config.lock().map_err(|e| e.to_string())?;
     let mod_path = PathBuf::from(config.deadlock_path.clone())
         .join("game")
         .join("citadel")
