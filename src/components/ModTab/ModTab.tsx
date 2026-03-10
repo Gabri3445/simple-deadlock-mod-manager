@@ -16,9 +16,9 @@ function ModTab({variant}: { variant: ModTabVariant }) {
         try {
             const result = await listMods()
             if (variant === ModTabVariant.LoadedMods) {
-                setMods(result.loaded_mods)
+                setMods(result.loaded_mods.map((x) => x.user_name))
             } else {
-                setMods(result.unloaded_mods)
+                setMods(result.unloaded_mods.map((x) => x.user_name))
             }
         } catch (err) {
             console.error(err);

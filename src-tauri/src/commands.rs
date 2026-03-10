@@ -73,40 +73,70 @@ pub fn change_path(path: String, state: State<ConfigState>) -> Result<String, St
 
 #[derive(Default, Deserialize, Serialize, Clone)]
 pub struct Mods {
-    pub loaded_mods: Vec<String>,
-    pub unloaded_mods: Vec<String>,
+    pub loaded_mods: Vec<ModName>,
+    pub unloaded_mods: Vec<ModName>,
 }
 
+//TODO: if the user deletes the name in the gui, revert to file name
+#[derive(Default, Deserialize, Serialize, Clone)]
+pub struct ModName {
+    pub file_name: String,
+    pub user_name: String,
+}
+
+//TODO: rewrite function
 #[tauri::command]
 pub fn list_mods(state: State<ConfigState>) -> Result<Mods, String> {
-    let config = state.config.lock().map_err(|e| e.to_string())?;
-    let mod_path = PathBuf::from(config.deadlock_path.clone())
-        .join("game")
-        .join("citadel")
-        .join("addons");
-    std::fs::create_dir_all(&mod_path).map_err(|e| e.to_string())?;
     let mut result: Mods = Mods::default();
-    let regex = Regex::new(r"^pak\d\d_dir\.vpk").unwrap();
-    if mod_path.is_dir() {
-        for entry in std::fs::read_dir(&mod_path).map_err(|e| e.to_string())? {
+    {
+        let mut config = state.config.lock().map_err(|e| e.to_string())?;
+        let mod_path = PathBuf::from(config.deadlock_path.clone())
+            .join("game")
+            .join("citadel")
+            .join("addons");
+        std::fs::create_dir_all(&mod_path).map_err(|e| e.to_string())?;
+
+        let regex = Regex::new(r"^pak\d\d_dir\.vpk").unwrap();
+        if mod_path.is_dir() {
             //read everything in the directory
-            let entry = entry.map_err(|e| e.to_string())?;
-            if entry.file_type().map_err(|e| e.to_string())?.is_file() {
+            for entry in std::fs::read_dir(&mod_path).map_err(|e| e.to_string())? {
+                let entry = entry.map_err(|e| e.to_string())?;
                 //is it a file?
-                let name = entry.file_name().to_string_lossy().into_owned();
-                if regex.is_match(&name) {
+                if entry.file_type().map_err(|e| e.to_string())?.is_file() {
+                    let name = entry.file_name().to_string_lossy().into_owned();
                     //check if it matches the loaded nomenclature
-                    result.loaded_mods.push(name.clone());
-                } else if let Some(extension) = entry.path().extension() {
-                    //if not it must be unloaded
-                    if extension == "vpk" {
+                    if regex.is_match(&name) {
+                        let mut user_name = "".to_string();
+                        if config.mod_names.contains_key(&name) {
+                            user_name = config.mod_names[&name].clone();
+                        } else {
+                            config.mod_names.insert(name.clone(), name.clone());
+                        }
+                        result.loaded_mods.push(ModName {
+                            user_name,
+                            file_name: entry.file_name().to_string_lossy().into_owned(),
+                        });
+                    } else if let Some(extension) = entry.path().extension() {
+                        //if not it must be unloaded
                         //only if it is a vpk file
-                        result.unloaded_mods.push(name.clone());
+                        if extension == "vpk" {
+                            let mut user_name = "".to_string();
+                            if config.mod_names.contains_key(&name) {
+                                user_name = config.mod_names[&name].clone();
+                            } else {
+                                config.mod_names.insert(name.clone(), name.clone());
+                            }
+                            result.unloaded_mods.push(ModName {
+                                user_name,
+                                file_name: entry.file_name().to_string_lossy().into_owned(),
+                            });
+                        }
                     }
                 }
             }
         }
     }
+    save_config(&state).map_err(|e| e.to_string())?;
     Ok(result)
 }
 
