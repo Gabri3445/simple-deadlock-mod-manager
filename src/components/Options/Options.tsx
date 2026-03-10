@@ -11,6 +11,7 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
 
     const onApply = async () => {
         await changePath({path: path});
+        onClose();
     }
 
     const onAutoDetectClick = async () => {
@@ -40,8 +41,11 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
                                 </div>
                             </div>
                         </div>
-                        <div className="ml-auto mb-8">
-                            <Button onClick={onApply}>Apply</Button>
+                        <div className="mb-8">
+                            <div className="flex w-full justify-between">
+                                <Button onClick={onClose}>Close</Button>
+                                <Button onClick={onApply}>Apply</Button>
+                            </div>
                         </div>
                     </div>
                 </div>
