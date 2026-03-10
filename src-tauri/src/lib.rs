@@ -28,6 +28,7 @@ pub fn run() {
             commands::get_deadlock_path,
             commands::load_config_command,
             commands::change_path,
+            commands::list_mods
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
