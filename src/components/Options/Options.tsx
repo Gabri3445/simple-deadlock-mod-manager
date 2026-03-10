@@ -19,6 +19,7 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
     const onApply = async () => {
         try {
             await changePath({path: path});
+            //TODO: need to call getmods again in modtab
             onClose();
         } catch (e) {
             console.error(e)
@@ -60,7 +61,7 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
                                 <label className="block mb-2">gameinfo.gi file status</label>
                                 <div className="flex gap-2">
                                     <div
-                                        className={`bg-gray-800 grow ${validConfig ? "bg-green-500" : "bg-red-500"}`}>{validConfig ? "Valid" : "Not valid"}</div>
+                                        className={`bg-gray-800 grow pl-2 ${validConfig ? "bg-green-500" : "bg-red-500"}`}>{validConfig ? "Valid" : "Not valid"}</div>
                                     <Button onClick={() => {
                                         checkGameinfoValidity({
                                             onSuccess: (r) => setValidConfig(r),
