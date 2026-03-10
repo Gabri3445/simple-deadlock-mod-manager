@@ -24,7 +24,7 @@ function ModTab({variant}: { variant: ModTabVariant }) {
     };
 
     useEffect(() => {
-        getMods();
+        getMods().then();
     }, []);
 
     return (
