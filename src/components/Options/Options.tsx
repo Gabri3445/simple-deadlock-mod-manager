@@ -1,13 +1,19 @@
 import {Modal} from "@mui/material";
 import Button from "../Button/Button.tsx";
 import {useEffect, useState} from "react";
-import {changePath, checkGameinfoValidity, getDeadlockPath, loadConfigCommand, makeConfigValid} from "../../generated";
+import {
+    changePath,
+    checkGameinfoValidity,
+    getAutoDetectDeadlockPath,
+    getConfig,
+    makeConfigValid
+} from "../../generated";
 
 function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
     const [path, setPath] = useState("");
     const [validConfig, setValidConfig] = useState<boolean>(false);
     useEffect(() => {
-        loadConfigCommand({
+        getConfig({
             onSuccess: (r) => setPath(r.deadlock_path),
             onInvokeError: (r) => console.error(r)
         }).then();
@@ -28,7 +34,7 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
 
     const onAutoDetectClick = async () => {
         try {
-            setPath(await getDeadlockPath());
+            setPath(await getAutoDetectDeadlockPath());
         } catch (e) {
             console.error(e)
         }

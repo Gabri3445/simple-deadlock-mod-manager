@@ -25,8 +25,8 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
-            commands::get_deadlock_path,
-            commands::load_config_command,
+            commands::get_auto_detect_deadlock_path,
+            commands::get_config,
             commands::change_path,
             commands::list_mods,
             commands::check_gameinfo_validity,
