@@ -1,5 +1,6 @@
 use crate::config::{save_config, ConfigState, ModManagerConfig};
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::Mutex;
 use tauri::State;
@@ -70,22 +71,39 @@ pub fn change_path(path: String, state: State<ConfigState>) -> Result<String, St
     Ok(path)
 }
 
-//TODO: temp function for testing, this should either return two lists for loaded and unloaded mods or have two different functions
+#[derive(Default, Deserialize, Serialize, Clone)]
+pub struct Mods {
+    pub loaded_mods: Vec<String>,
+    pub unloaded_mods: Vec<String>,
+}
+
 #[tauri::command]
-pub fn list_mods(state: State<ConfigState>) -> Result<Vec<String>, String> {
+pub fn list_mods(state: State<ConfigState>) -> Result<Mods, String> {
     let config = state.config.lock().map_err(|e| e.to_string())?;
-    let mod_path = PathBuf::from(config.deadlock_path.clone()) //TODO: make sure to create the addons directory if it does not exist
+    let mod_path = PathBuf::from(config.deadlock_path.clone())
         .join("game")
         .join("citadel")
         .join("addons");
-    let mut result: Vec<String> = Vec::new();
+    std::fs::create_dir_all(&mod_path).map_err(|e| e.to_string())?;
+    let mut result: Mods = Mods::default();
     let regex = Regex::new(r"^pak\d\d_dir\.vpk").unwrap();
     if mod_path.is_dir() {
         for entry in std::fs::read_dir(&mod_path).map_err(|e| e.to_string())? {
+            //read everything in the directory
             let entry = entry.map_err(|e| e.to_string())?;
-            let name = entry.file_name().to_string_lossy().into_owned();
-            if regex.is_match(&name) {
-                result.push(name);
+            if entry.file_type().map_err(|e| e.to_string())?.is_file() {
+                //is it a file?
+                let name = entry.file_name().to_string_lossy().into_owned();
+                if regex.is_match(&name) {
+                    //check if it matches the loaded nomenclature
+                    result.loaded_mods.push(name.clone());
+                } else if let Some(extension) = entry.path().extension() {
+                    //if not it must be unloaded
+                    if extension == "vpk" {
+                        //only if it is a vpk file
+                        result.unloaded_mods.push(name.clone());
+                    }
+                }
             }
         }
     }

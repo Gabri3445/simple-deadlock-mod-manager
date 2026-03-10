@@ -14,8 +14,12 @@ function ModTab({variant}: { variant: ModTabVariant }) {
 
     const getMods = async () => {
         try {
-            const result = await listMods();
-            setMods(result);
+            const result = await listMods()
+            if (variant === ModTabVariant.LoadedMods) {
+                setMods(result.loaded_mods)
+            } else {
+                setMods(result.unloaded_mods)
+            }
         } catch (err) {
             console.error(err);
         } finally {
