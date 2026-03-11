@@ -30,7 +30,8 @@ pub fn run() {
             commands::change_path,
             commands::list_mods,
             commands::check_gameinfo_validity,
-            commands::make_config_valid
+            commands::make_config_valid,
+            commands::change_mod_name
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

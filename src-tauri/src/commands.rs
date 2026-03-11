@@ -222,3 +222,27 @@ pub fn make_config_valid(state: State<ConfigState>) -> Result<(), String> {
         gameinfo_path
     ))
 }
+
+#[tauri::command]
+pub fn change_mod_name(
+    state: State<ConfigState>,
+    mut user_name: String,
+    file_name: String,
+) -> Result<String, String> {
+    {
+        let mut config = state.config.lock().map_err(|e| e.to_string())?;
+        if !config.mod_names.contains_key(&file_name) {
+            return Err("File name is not valid".to_string());
+        }
+        if user_name == "" {
+            user_name = file_name.clone();
+        }
+        let mod_name = config
+            .mod_names
+            .entry(file_name.clone())
+            .or_insert(file_name);
+        *mod_name = user_name.clone();
+    }
+    save_config(&state).map_err(|e| e.to_string())?;
+    Ok(user_name)
+}

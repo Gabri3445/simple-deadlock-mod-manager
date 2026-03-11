@@ -1,9 +1,11 @@
 import {useState} from "react";
 import {Textfit} from 'react-textfit';
 import {Tooltip} from "@mui/material";
+import {useModsStore} from "../../stores/useModsStore.ts";
 
-function Mod({modName}: { modName: string }) {
+function Mod({modName, fileName}: { modName: string, fileName: string }) {
     const colors = ["bg-gunItem", "bg-vitalityItem", "bg-spiritItem"];
+    const {changeModName} = useModsStore()
 
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(modName);
@@ -17,9 +19,15 @@ function Mod({modName}: { modName: string }) {
                     value={value}
                     autoFocus
                     onChange={(e) => setValue(e.target.value)}
-                    onBlur={() => setIsEditing(false)}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") setIsEditing(false);
+                    onBlur={async () => {
+                        setIsEditing(false)
+                        await changeModName(value, fileName)
+                    }}
+                    onKeyDown={async (e) => {
+                        if (e.key === "Enter") {
+                            setIsEditing(false);
+                            await changeModName(value, fileName)
+                        }
                     }}
                     className="bg-transparent text-center outline-none border"
                 />
