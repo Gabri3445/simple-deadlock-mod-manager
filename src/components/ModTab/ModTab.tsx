@@ -16,7 +16,7 @@ function ModTab({variant, mods, loading}: { variant: ModTabVariant, mods: ModNam
                     {loading ? (
                         <></>
                     ) : mods.map((mod) => (
-                        <Mod modName={mod.user_name} key={mod.file_name} fileName={mod.file_name}/>
+                        <Mod modName={mod.user_name} key={mod.file_name} fileName={mod.file_name} variant={variant}/>
                     ))}
                 </div>
             </div>

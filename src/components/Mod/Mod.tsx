@@ -3,10 +3,11 @@ import {Textfit} from 'react-textfit';
 import {Tooltip} from "@mui/material";
 import {useModsStore} from "../../stores/useModsStore.ts";
 import Button from "../Button/Button.tsx";
+import {ModTabVariant} from "../ModTab/ModTab.tsx";
 
-function Mod({modName, fileName}: { modName: string, fileName: string }) {
+function Mod({modName, fileName, variant}: { modName: string, fileName: string, variant: ModTabVariant }) {
     const colors = ["bg-gunItem", "bg-vitalityItem", "bg-spiritItem"];
-    const {changeModName} = useModsStore()
+    const {changeModName, addSelectedMod, removeSelectedMod, selectedMods} = useModsStore()
 
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(modName);
@@ -51,7 +52,21 @@ function Mod({modName, fileName}: { modName: string, fileName: string }) {
             <div className="absolute top-2 right-2">
                 <input
                     className="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"
-                    type={"checkbox"}/>
+                    type={"checkbox"}
+                    onChange={(e) => {
+                        if (selectedMods.filter((f) => (f.variant !== variant)).length > 0) {
+                            e.target.checked = !e.target.checked;
+                            return;
+                        }
+                        switch (e.target.checked) {
+                            case true:
+                                addSelectedMod({variant, fileName, userName: modName})
+                                break;
+                            case false:
+                                removeSelectedMod({variant, fileName, userName: modName})
+                        }
+                    }}
+                />
             </div>
         </div>
     );
