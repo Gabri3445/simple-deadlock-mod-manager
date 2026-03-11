@@ -1,36 +1,12 @@
 import Mod from "../Mod/Mod.tsx";
-import {listMods} from "../../generated";
-import {useEffect, useState} from "react";
+import {ModName} from "../../generated";
 
 export enum ModTabVariant {
     LoadedMods,
     UnloadedMods
 }
 
-function ModTab({variant}: { variant: ModTabVariant }) {
-
-    const [mods, setMods] = useState<string[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    const getMods = async () => {
-        try {
-            const result = await listMods()
-            if (variant === ModTabVariant.LoadedMods) {
-                setMods(result.loaded_mods.map((x) => x.user_name))
-            } else {
-                setMods(result.unloaded_mods.map((x) => x.user_name))
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        getMods();
-    }, []);
-
+function ModTab({variant, mods, loading}: { variant: ModTabVariant, mods: ModName[], loading: boolean }) {
     return (
         <div className="flex-1 bg-cream p-3 first:pr-1.5">
             <div className="border-3 h-full border-t-0 border-darker-cream">
@@ -40,7 +16,7 @@ function ModTab({variant}: { variant: ModTabVariant }) {
                     {loading ? (
                         <></>
                     ) : mods.map((mod) => (
-                        <Mod modName={mod} key={mod}/>
+                        <Mod modName={mod.user_name} key={mod.file_name}/>
                     ))}
                 </div>
             </div>
