@@ -3,6 +3,9 @@ import TopBar from "./components/TopBar/TopBar.tsx";
 import ModTab, {ModTabVariant} from "./components/ModTab/ModTab.tsx";
 import {useModsStore} from "./stores/useModsStore.ts";
 import {useEffect, useState} from "react";
+import LoadModButtons from "./components/LoadModButtons/LoadModButtons.tsx";
+
+
 
 function App() {
 
@@ -28,6 +31,7 @@ function App() {
             <TopBar/>
             <div className="flex flex-1">
                 <ModTab variant={ModTabVariant.UnloadedMods} mods={mods.unloaded_mods} loading={loading}/>
+                <LoadModButtons/>
                 <ModTab variant={ModTabVariant.LoadedMods} mods={mods.loaded_mods} loading={loading}/>
             </div>
         </main>
