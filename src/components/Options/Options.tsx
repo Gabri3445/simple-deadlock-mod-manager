@@ -42,7 +42,6 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
         try {
             await changePath({path: path});
             setMods(await getModsFromRust());
-            //TODO: need to call getmods again in modtab
             onClose();
         } catch (e) {
             console.error(e)
