@@ -10,6 +10,9 @@ enum ButtonType {
 function LoadModButtons() {
     const {selectedMods, changeModLoadStatus} = useModsStore();
     const onClick = (buttonType: ButtonType) => {
+        if (selectedMods.length === 0) {
+            return;
+        }
         if (buttonType === ButtonType.LEFT && selectedMods[0].variant === ModTabVariant.UnloadedMods
             ||
             buttonType === ButtonType.RIGHT && selectedMods[0].variant === ModTabVariant.LoadedMods) {
