@@ -7,6 +7,7 @@ use tauri::State;
 
 const DEADLOCK_APP_ID: u32 = 1422450;
 
+//From https://deadlocker.net/install-guide
 const FILESYSTEM_BLOCK_CONTENTS: &str = r#"FileSystem
 {
 	//
