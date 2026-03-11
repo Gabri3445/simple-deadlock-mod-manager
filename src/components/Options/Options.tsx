@@ -8,8 +8,10 @@ import {
     getConfig,
     makeConfigValid
 } from "../../generated";
+import {useModsStore} from "../../stores/useModsStore.ts";
 
 function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
+    const {setMods, getModsFromRust} = useModsStore();
     const [path, setPath] = useState("");
     const [validConfig, setValidConfig] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
@@ -23,6 +25,7 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
             if (config.deadlock_path === "") {
                 const path = await getAutoDetectDeadlockPath();
                 await changePath({path: path});
+                setMods(await getModsFromRust());
                 setPath(path);
             } else {
                 setPath(config.deadlock_path);
@@ -38,6 +41,7 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
     const onApply = async () => {
         try {
             await changePath({path: path});
+            setMods(await getModsFromRust());
             //TODO: need to call getmods again in modtab
             onClose();
         } catch (e) {
@@ -49,6 +53,8 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
         try {
             setPath(await getAutoDetectDeadlockPath());
             await changePath({path: path});
+            setValidConfig(await checkGameinfoValidity());
+            setMods(await getModsFromRust());
         } catch (e) {
             console.error(e)
         }
@@ -76,6 +82,7 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
                                                                                            onKeyDown={async (e) => {
                                                                                                if (e.key === "Enter") {
                                                                                                    await changePath({path: path});
+                                                                                                   setMods(await getModsFromRust());
                                                                                                    setValidConfig(await checkGameinfoValidity());
                                                                                                }
                                                                                            }}
