@@ -40,6 +40,15 @@ const FILESYSTEM_BLOCK_CONTENTS: &str = r#"FileSystem
 	}
 }"#;
 
+//basic way to check if the path is valid
+fn is_deadlock_path_valid(deadlock_path: &String) -> bool {
+    let gameinfo_path = PathBuf::from(deadlock_path)
+        .join("game")
+        .join("citadel")
+        .join("gameinfo.gi");
+    return gameinfo_path.exists();
+}
+
 /// Get the path to the Deadlock game installation directory
 #[tauri::command]
 pub fn get_auto_detect_deadlock_path() -> Result<String, String> {
@@ -90,6 +99,9 @@ pub fn list_mods(state: State<ConfigState>) -> Result<Mods, String> {
     let mut result: Mods = Mods::default();
     {
         let mut config = state.config.lock().map_err(|e| e.to_string())?;
+        if !is_deadlock_path_valid(&config.deadlock_path) {
+            return Err("Deadlock path is not valid".to_string());
+        }
         if config.deadlock_path == "" {
             return Err("Deadlock path not set".to_string());
         }
@@ -163,6 +175,9 @@ pub fn check_gameinfo_validity(state: State<ConfigState>) -> Result<bool, String
 #[tauri::command]
 pub fn make_config_valid(state: State<ConfigState>) -> Result<(), String> {
     let config = state.config.lock().map_err(|e| e.to_string())?;
+    if !is_deadlock_path_valid(&config.deadlock_path) {
+        return Err("Deadlock path is not valid".to_string());
+    }
     let gameinfo_path = PathBuf::from(config.deadlock_path.clone())
         .join("game")
         .join("citadel")
