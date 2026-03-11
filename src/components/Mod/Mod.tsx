@@ -2,7 +2,6 @@ import {useState} from "react";
 import {Textfit} from 'react-textfit';
 import {Tooltip} from "@mui/material";
 import {useModsStore} from "../../stores/useModsStore.ts";
-import Button from "../Button/Button.tsx";
 import {ModTabVariant} from "../ModTab/ModTab.tsx";
 
 function Mod({modName, fileName, variant}: { modName: string, fileName: string, variant: ModTabVariant }) {
@@ -45,10 +44,12 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
                     </Tooltip>
                 </div>
             )}
+            {/* Not sure if load order matters, todo at a later date if it does
             <div className="flex gap-2 h-7">
                 <Button>&lt;</Button>
                 <Button>&gt;</Button>
             </div>
+            */}
             <div className="absolute top-2 right-2">
                 <input
                     className="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"
