@@ -2,6 +2,7 @@ import {useState} from "react";
 import {Textfit} from 'react-textfit';
 import {Tooltip} from "@mui/material";
 import {useModsStore} from "../../stores/useModsStore.ts";
+import Button from "../Button/Button.tsx";
 
 function Mod({modName, fileName}: { modName: string, fileName: string }) {
     const colors = ["bg-gunItem", "bg-vitalityItem", "bg-spiritItem"];
@@ -13,7 +14,8 @@ function Mod({modName, fileName}: { modName: string, fileName: string }) {
     const [color] = useState(colors[Math.floor(Math.random() * colors.length)]);
 
     return (
-        <div className={`${color} h-20 flex items-center justify-center text-black font-bold rounded-lg`}>
+        <div
+            className={`${color} h-30 relative flex flex-col items-center justify-center text-black font-bold rounded-lg`}>
             {isEditing ? (
                 <input
                     value={value}
@@ -42,6 +44,15 @@ function Mod({modName, fileName}: { modName: string, fileName: string }) {
                     </Tooltip>
                 </div>
             )}
+            <div className="flex gap-2 h-7">
+                <Button>&lt;</Button>
+                <Button>&gt;</Button>
+            </div>
+            <div className="absolute top-2 right-2">
+                <input
+                    className="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"
+                    type={"checkbox"}/>
+            </div>
         </div>
     );
 }
