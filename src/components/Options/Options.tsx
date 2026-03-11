@@ -12,23 +12,28 @@ import {
 function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
     const [path, setPath] = useState("");
     const [validConfig, setValidConfig] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     useEffect(() => {
-        getConfig({
-            onSuccess: (r) => {
-                if (r.deadlock_path === "") {
-                    getAutoDetectDeadlockPath({
-                        onSuccess: (p) => setPath(p),
-                    }).then()
-                } else {
-                    setPath(r.deadlock_path);
-                }
-            },
-            onInvokeError: (r) => console.error(r)
-        }).then();
-        checkGameinfoValidity({
-            onSuccess: (r) => setValidConfig(r),
-        }).then();
+        getOptionsConfig();
     }, [])
+
+    const getOptionsConfig = async () => {
+        try {
+            const config = await getConfig();
+            if (config.deadlock_path === "") {
+                const path = await getAutoDetectDeadlockPath();
+                await changePath({path: path});
+                setPath(path);
+            } else {
+                setPath(config.deadlock_path);
+            }
+            setValidConfig(await checkGameinfoValidity())
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const onApply = async () => {
         try {
@@ -43,6 +48,7 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
     const onAutoDetectClick = async () => {
         try {
             setPath(await getAutoDetectDeadlockPath());
+            await changePath({path: path});
         } catch (e) {
             console.error(e)
         }
@@ -56,42 +62,54 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
                             <div className="text-white mt-8 text-3xl font-extrabold">
                                 Options
                             </div>
-                            <div className="mt-8 text-xl">
-                                <label className="block mb-2" htmlFor="pathInput">
-                                    Deadlock Path
-                                </label>
-                                <div className="flex">
-                                    <div className="bg-gray-800 grow mr-20"><input id="pathInput" value={path}
-                                                                                   onChange={(e) => {
-                                        setPath(e.target.value)
-                                    }} className="text-lg m-1 w-full mr-1"/>
+                            {!loading && (
+                                <>
+                                    <div className="mt-8 text-xl">
+                                        <label className="block mb-2" htmlFor="pathInput">
+                                            Deadlock Path
+                                        </label>
+                                        <div className="flex">
+                                            <div className="bg-gray-800 grow mr-20"><input id="pathInput" value={path}
+                                                                                           onChange={(e) => {
+                                                                                               setPath(e.target.value)
+                                                                                           }}
+                                                                                           onKeyDown={async (e) => {
+                                                                                               if (e.key === "Enter") {
+                                                                                                   await changePath({path: path});
+                                                                                                   setValidConfig(await checkGameinfoValidity());
+                                                                                               }
+                                                                                           }}
+                                                                                           className="text-lg m-1 w-full mr-1"/>
+                                            </div>
+                                            <Button onClick={onAutoDetectClick}>
+                                                Auto-Detect
+                                            </Button>
+                                        </div>
                                     </div>
-                                    <Button onClick={onAutoDetectClick}>
-                                        Auto-Detect
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="mt-8 text-xl">
-                                <label className="block mb-2">gameinfo.gi file status</label>
-                                <div className="flex gap-2">
-                                    <div
-                                        className={`bg-gray-800 grow pl-2 ${validConfig ? "bg-green-500" : "bg-red-500"}`}>{validConfig ? "Valid" : "Not valid"}</div>
-                                    <Button onClick={() => {
-                                        checkGameinfoValidity({
-                                            onSuccess: (r) => setValidConfig(r),
-                                        }).then();
-                                    }}>Check Validity</Button>
-                                    <Button onClick={() => {
-                                        makeConfigValid({
-                                            onSuccess: () => {
-                                                checkGameinfoValidity({
-                                                    onSuccess: (r) => setValidConfig(r),
-                                                }).then()
-                                            }
-                                        }).then()
-                                    }}>Make valid</Button>
-                                </div>
-                            </div>
+                                    <div className="mt-8 text-xl">
+                                        <label className="block mb-2">gameinfo.gi file status</label>
+                                        <div className="flex gap-2">
+                                            <div
+                                                className={`bg-gray-800 grow pl-2 ${validConfig ? "bg-green-500" : "bg-red-500"}`}>{validConfig ? "Valid" : "Not valid"}</div>
+                                            <Button onClick={async () => {
+                                                try {
+                                                    setValidConfig(await checkGameinfoValidity());
+                                                } catch (e) {
+                                                    console.error(e);
+                                                }
+                                            }}>Check Validity</Button>
+                                            <Button onClick={async () => {
+                                                try {
+                                                    await makeConfigValid();
+                                                    setValidConfig(await checkGameinfoValidity());
+                                                } catch (e) {
+                                                    console.error(e);
+                                                }
+                                            }}>Make valid</Button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                         <div className="mb-8">
                             <div className="flex w-full justify-between">
