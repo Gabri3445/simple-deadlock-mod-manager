@@ -8,7 +8,7 @@ export enum ModTabVariant {
 
 function ModTab({variant, mods, loading}: { variant: ModTabVariant, mods: ModName[], loading: boolean }) {
     return (
-        <div className="flex-1 bg-cream p-3 first:pr-1.5">
+        <div className="flex-1 bg-cream p-3 first:pr-1.5 last:pl-1.5">
             <div className="border-3 h-full border-t-0 border-darker-cream">
                 <div
                     className="bg-darker-cream text-white h-8.75 leading-8.75 pl-2">{variant === ModTabVariant.LoadedMods ? "Loaded Mods" : "Unloaded Mods"}</div>
