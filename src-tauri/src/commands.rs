@@ -87,7 +87,6 @@ pub struct Mods {
     pub unloaded_mods: Vec<ModName>,
 }
 
-//TODO: if the user deletes the name in the gui, revert to file name
 #[derive(Default, Deserialize, Serialize, Clone)]
 pub struct ModName {
     pub file_name: String,

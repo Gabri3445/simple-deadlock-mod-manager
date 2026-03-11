@@ -22,11 +22,17 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
                     autoFocus
                     onChange={(e) => setValue(e.target.value)}
                     onBlur={async () => {
+                        if (value === "") {
+                            setValue(fileName);
+                        }
                         setIsEditing(false)
                         await changeModName(value, fileName)
                     }}
                     onKeyDown={async (e) => {
                         if (e.key === "Enter") {
+                            if (value === "") {
+                                setValue(fileName);
+                            }
                             setIsEditing(false);
                             await changeModName(value, fileName)
                         }
