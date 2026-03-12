@@ -4,7 +4,7 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::fs::DirEntry;
 use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+use std::sync::{Mutex, MutexGuard};
 use tauri::State;
 
 const DEADLOCK_APP_ID: u32 = 1422450;
@@ -256,7 +256,6 @@ pub enum Operation {
 }
 
 /*
-Todo:
 This function takes in the which mods should be changed.
 It will then rename mods that have been unloaded to ****pak**_dir.vpk
 If the user has not specified a custom name for it then rename them to the new file name (****pak**_dir.vpk) else keep the user name for it
@@ -309,16 +308,7 @@ pub fn apply_changes(
                                 if !new_path.exists() {
                                     std::fs::rename(entry.path(), new_path)
                                         .map_err(|e| e.to_string())?;
-                                    if let Some(mut v) =
-                                        config.mod_names.remove(&mod_to_load.file_name)
-                                    {
-                                        if mod_to_load.file_name == mod_to_load.user_name {
-                                            config.mod_names.insert(new_name.clone(), new_name);
-                                        } else {
-                                            v = mod_to_load.user_name.clone();
-                                            config.mod_names.insert(new_name, v);
-                                        }
-                                    }
+                                    update_config_mod_name(&mut config, &mod_to_load, new_name);
                                     break;
                                 }
                                 pak_number += 1;
@@ -343,14 +333,7 @@ pub fn apply_changes(
                             );
                             let new_path = mod_path.join(&new_name);
                             std::fs::rename(entry.path(), new_path).map_err(|e| e.to_string())?;
-                            if let Some(mut v) = config.mod_names.remove(&mod_to_unload.file_name) {
-                                if mod_to_unload.file_name == mod_to_unload.user_name {
-                                    config.mod_names.insert(new_name.clone(), new_name);
-                                } else {
-                                    v = mod_to_unload.user_name.clone();
-                                    config.mod_names.insert(new_name, v);
-                                }
-                            }
+                            update_config_mod_name(&mut config, &mod_to_unload, new_name);
                         }
                     }
                 }
@@ -360,4 +343,20 @@ pub fn apply_changes(
     }
     save_config(&state).map_err(|e| e.to_string())?;
     Ok(discovered_mods)
+}
+
+fn update_config_mod_name(
+    config: &mut MutexGuard<ModManagerConfig>,
+    mod_name: &ModName,
+    new_name: String,
+) {
+    if config.mod_names.remove(&mod_name.file_name).is_some() {
+        if mod_name.file_name == mod_name.user_name {
+            config.mod_names.insert(new_name.clone(), new_name);
+        } else {
+            config
+                .mod_names
+                .insert(new_name, mod_name.user_name.clone());
+        }
+    }
 }
