@@ -248,3 +248,96 @@ pub fn change_mod_name(
     save_config(&state).map_err(|e| e.to_string())?;
     Ok(user_name)
 }
+
+pub enum Operation {
+    LoadMods,
+    UnloadMods,
+}
+
+/*
+Todo:
+This function takes in the which mods should be changed.
+It will then rename mods that have been unloaded to ****pak**_dir.vpk
+If the user has not specified a custom name for it then rename them to the new file name (****pak**_dir.vpk) else keep the user name for it
+For mods that have been loaded it will rename them to pak**dir.vpk
+Again if they do not have a custom name (check by comparing the user name and the file name) just rename to the new name or keep the custom one
+Finally it should save the config with the modified file names
+*/
+#[tauri::command]
+pub fn apply_changes(
+    mods: Vec<ModName>,
+    operation: Operation,
+    state: State<ConfigState>,
+) -> Result<Mods, String> {
+    let mut discovered_mods = Mods::default();
+    {
+        let mut config = state.config.lock().map_err(|e| e.to_string())?;
+        if !is_deadlock_path_valid(&config.deadlock_path) {
+            return Err("Deadlock path is not valid".to_string());
+        }
+        if config.deadlock_path == "" {
+            return Err("Deadlock path not set".to_string());
+        }
+        let mod_path = PathBuf::from(config.deadlock_path.clone())
+            .join("game")
+            .join("citadel")
+            .join("addons");
+        let mut mods_dir_entries = Vec::<DirEntry>::new();
+        if mod_path.is_dir() {
+            for entry in std::fs::read_dir(&mod_path).map_err(|e| e.to_string())? {
+                let entry = entry.map_err(|e| e.to_string())?;
+                if let Some(extension) = entry.path().extension() {
+                    if extension == "vpk" {
+                        mods_dir_entries.push(entry);
+                    }
+                }
+            }
+        }
+        match operation {
+            Operation::LoadMods => {
+                //rename file to pak**_dir.vpk
+                //check first available number (todo mod load order)
+                for mod_to_load in mods {
+                    for entry in &mods_dir_entries {
+                        if mod_to_load.file_name == entry.file_name().to_string_lossy().to_string()
+                        {
+                            let mut pak_number = 1;
+                            loop {
+                                let new_name =
+                                    mod_path.join(format!("pak{:02}_dir.vpk", pak_number));
+                                if !new_name.exists() {
+                                    std::fs::rename(entry.path(), new_name)
+                                        .map_err(|e| e.to_string())?;
+                                    break;
+                                }
+                                pak_number += 1;
+                            }
+                        }
+                    }
+                }
+            }
+            Operation::UnloadMods => {
+                //add random 4 numbers to start
+                let mut rng = rand::thread_rng();
+                for mod_to_unload in mods {
+                    for entry in &mods_dir_entries {
+                        if mod_to_unload.file_name
+                            == entry.file_name().to_string_lossy().to_string()
+                        {
+                            let random_prefix = rng.gen_range(0..9999);
+                            let new_name = mod_path.join(format!(
+                                "{}_{}",
+                                random_prefix,
+                                entry.file_name().to_string_lossy()
+                            ));
+                            std::fs::rename(entry.path(), new_name).map_err(|e| e.to_string())?;
+                        }
+                    }
+                }
+            }
+        }
+        discovered_mods = process_mod_directory(&mod_path, &mut config)?;
+    }
+    save_config(&state).map_err(|e| e.to_string())?;
+    Ok(discovered_mods)
+}
