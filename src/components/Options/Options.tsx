@@ -9,8 +9,10 @@ import {
     makeConfigValid
 } from "../../generated";
 import {useModsStore} from "../../stores/useModsStore.ts";
+import {useErrorStore} from "../../stores/useErrorStore.ts";
 
 function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
+    const {setVisible, setError} = useErrorStore();
     const {setMods, getModsFromRust} = useModsStore();
     const [path, setPath] = useState("");
     const [validConfig, setValidConfig] = useState<boolean>(false);
@@ -32,7 +34,8 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
             }
             setValidConfig(await checkGameinfoValidity())
         } catch (e) {
-            console.error(e);
+            setVisible(true);
+            setError(e as string);
         } finally {
             setLoading(false);
         }
@@ -44,7 +47,8 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
             setMods(await getModsFromRust());
             onClose();
         } catch (e) {
-            console.error(e)
+            setVisible(true);
+            setError(e as string);
         }
     }
 
@@ -55,7 +59,8 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
             setValidConfig(await checkGameinfoValidity());
             setMods(await getModsFromRust());
         } catch (e) {
-            console.error(e)
+            setVisible(true);
+            setError(e as string);
         }
     }
     return (
@@ -80,9 +85,14 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
                                                                                            }}
                                                                                            onKeyDown={async (e) => {
                                                                                                if (e.key === "Enter") {
-                                                                                                   await changePath({path: path});
-                                                                                                   setMods(await getModsFromRust());
-                                                                                                   setValidConfig(await checkGameinfoValidity());
+                                                                                                   try {
+                                                                                                       await changePath({path: path});
+                                                                                                       setMods(await getModsFromRust());
+                                                                                                       setValidConfig(await checkGameinfoValidity());
+                                                                                                   } catch (e) {
+                                                                                                       setVisible(true);
+                                                                                                       setError(e as string);
+                                                                                                   }
                                                                                                }
                                                                                            }}
                                                                                            className="text-lg m-1 w-full mr-1"/>
@@ -101,7 +111,8 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
                                                 try {
                                                     setValidConfig(await checkGameinfoValidity());
                                                 } catch (e) {
-                                                    console.error(e);
+                                                    setVisible(true);
+                                                    setError(e as string);
                                                 }
                                             }}>Check Validity</Button>
                                             <Button onClick={async () => {
@@ -109,7 +120,8 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
                                                     await makeConfigValid();
                                                     setValidConfig(await checkGameinfoValidity());
                                                 } catch (e) {
-                                                    console.error(e);
+                                                    setVisible(true);
+                                                    setError(e as string);
                                                 }
                                             }}>Make valid</Button>
                                         </div>

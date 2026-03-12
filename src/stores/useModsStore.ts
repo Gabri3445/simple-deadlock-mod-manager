@@ -23,10 +23,11 @@ interface ModsStore {
     removeSelectedMod: (mod: SelectedMod) => void,
     changeModLoadStatus: (mods: SelectedMod[]) => void,
     setMods: (mods: Mods) => void;
-    getModsFromRust: () => Promise<Mods | null>;
+    getModsFromRust: () => Promise<Mods>;
     changeModName: (userName: string, fileName: string) => Promise<void>;
 }
 
+//functions that invoke commands can throw and should be try catched
 export const useModsStore = create<ModsStore>((set, get) => ({
     mods: {
         loaded_mods: [],
@@ -137,12 +138,7 @@ export const useModsStore = create<ModsStore>((set, get) => ({
     },
     setMods: (mods: Mods) => set({mods: mods}),
     getModsFromRust: async () => {
-        try {
-            return await listMods();
-        } catch (e) {
-            console.error(e);
-            return null;
-        }
+        return await listMods();
     },
     changeModName: async (userName: string, fileName: string) => {
         await changeModName({fileName, userName});

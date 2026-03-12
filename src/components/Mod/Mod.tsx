@@ -3,8 +3,10 @@ import {Textfit} from 'react-textfit';
 import {Tooltip} from "@mui/material";
 import {useModsStore} from "../../stores/useModsStore.ts";
 import {ModTabVariant} from "../ModTab/ModTab.tsx";
+import {useErrorStore} from "../../stores/useErrorStore.ts";
 
 function Mod({modName, fileName, variant}: { modName: string, fileName: string, variant: ModTabVariant }) {
+    const {setVisible, setError} = useErrorStore();
     const colors = ["bg-gunItem", "bg-vitalityItem", "bg-spiritItem"];
     const {changeModName, addSelectedMod, removeSelectedMod, selectedMods} = useModsStore()
 
@@ -26,7 +28,12 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
                             setValue(fileName);
                         }
                         setIsEditing(false)
-                        await changeModName(value, fileName)
+                        try {
+                            await changeModName(value, fileName)
+                        } catch (error) {
+                            setVisible(true);
+                            setError(error as string);
+                        }
                     }}
                     onKeyDown={async (e) => {
                         if (e.key === "Enter") {
@@ -34,7 +41,11 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
                                 setValue(fileName);
                             }
                             setIsEditing(false);
-                            await changeModName(value, fileName)
+                            try {
+                                await changeModName(value, fileName)
+                            } catch (error) {
+                                setVisible(true);
+                            }
                         }
                     }}
                     className="bg-transparent text-center outline-none border"

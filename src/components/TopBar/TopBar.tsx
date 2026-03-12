@@ -4,10 +4,12 @@ import {downloadDir} from "@tauri-apps/api/path";
 import Options from "../Options/Options.tsx";
 import {useState} from "react";
 import {useModsStore} from "../../stores/useModsStore.ts";
+import {useErrorStore} from "../../stores/useErrorStore.ts";
 
 function TopBar() {
 
     const {applyModChanges} = useModsStore();
+    const {setError, setVisible} = useErrorStore();
 
     const onLoadModClick = async (): Promise<void> => {
         // @ts-ignore
@@ -31,7 +33,13 @@ function TopBar() {
                 <Button onClick={handleOpenModal}>Options</Button>
                 <Options isOpen={openModal} onClose={handleCloseModal}/>
                 <Button onClick={async () => {
-                    await applyModChanges(); //TODO: auto apply button in settings
+                    try {
+                        await applyModChanges();
+                    } catch (error) {
+                        setError(error as string);
+                        setVisible(true);
+                    }
+                    //TODO: auto apply button in settings
                 }}>Apply</Button>
             </div>
         </div>
