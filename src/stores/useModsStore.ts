@@ -39,6 +39,10 @@ export const useModsStore = create<ModsStore>((set, get) => ({
 
         let changed = [...state.changedMods];
 
+        if (changed.length === 0) {
+            return;
+        }
+
         let modsToLoad = changed.filter((x) => x.operation === "LoadMods").map((x) => ({
             file_name: x.fileName,
             user_name: x.userName
