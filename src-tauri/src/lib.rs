@@ -7,6 +7,7 @@ use tauri::Manager;
 
 mod commands;
 mod config;
+mod types;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
