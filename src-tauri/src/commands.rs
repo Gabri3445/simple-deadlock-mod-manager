@@ -304,11 +304,21 @@ pub fn apply_changes(
                         {
                             let mut pak_number = 1;
                             loop {
-                                let new_name =
-                                    mod_path.join(format!("pak{:02}_dir.vpk", pak_number));
-                                if !new_name.exists() {
-                                    std::fs::rename(entry.path(), new_name)
+                                let new_name = format!("pak{:02}_dir.vpk", pak_number);
+                                let new_path = mod_path.join(&new_name);
+                                if !new_path.exists() {
+                                    std::fs::rename(entry.path(), new_path)
                                         .map_err(|e| e.to_string())?;
+                                    if let Some(mut v) =
+                                        config.mod_names.remove(&mod_to_load.file_name)
+                                    {
+                                        if mod_to_load.file_name == mod_to_load.user_name {
+                                            config.mod_names.insert(new_name.clone(), new_name);
+                                        } else {
+                                            v = mod_to_load.user_name.clone();
+                                            config.mod_names.insert(new_name, v);
+                                        }
+                                    }
                                     break;
                                 }
                                 pak_number += 1;
@@ -326,12 +336,21 @@ pub fn apply_changes(
                             == entry.file_name().to_string_lossy().to_string()
                         {
                             let random_prefix = rng.gen_range(0..9999);
-                            let new_name = mod_path.join(format!(
+                            let new_name = format!(
                                 "{}_{}",
                                 random_prefix,
                                 entry.file_name().to_string_lossy()
-                            ));
-                            std::fs::rename(entry.path(), new_name).map_err(|e| e.to_string())?;
+                            );
+                            let new_path = mod_path.join(&new_name);
+                            std::fs::rename(entry.path(), new_path).map_err(|e| e.to_string())?;
+                            if let Some(mut v) = config.mod_names.remove(&mod_to_unload.file_name) {
+                                if mod_to_unload.file_name == mod_to_unload.user_name {
+                                    config.mod_names.insert(new_name.clone(), new_name);
+                                } else {
+                                    v = mod_to_unload.user_name.clone();
+                                    config.mod_names.insert(new_name, v);
+                                }
+                            }
                         }
                     }
                 }
