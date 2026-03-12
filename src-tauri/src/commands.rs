@@ -1,7 +1,9 @@
 use crate::config::{save_config, ConfigState, ModManagerConfig};
+use rand::Rng;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::fs::DirEntry;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use tauri::State;
 
@@ -40,6 +42,20 @@ const FILESYSTEM_BLOCK_CONTENTS: &str = r#"FileSystem
 		OfficialAddonRoot   citadel_community_addons
 	}
 }"#;
+
+const VALID_MOD_REGEX: &str = r"^pak\d\d_dir\.vpk";
+
+#[derive(Default, Deserialize, Serialize, Clone)]
+pub struct Mods {
+    pub loaded_mods: Vec<ModName>,
+    pub unloaded_mods: Vec<ModName>,
+}
+
+#[derive(Default, Deserialize, Serialize, Clone)]
+pub struct ModName {
+    pub file_name: String,
+    pub user_name: String,
+}
 
 //basic way to check if the path is valid
 fn is_deadlock_path_valid(deadlock_path: &String) -> bool {
@@ -81,77 +97,64 @@ pub fn change_path(path: String, state: State<ConfigState>) -> Result<String, St
     Ok(path)
 }
 
-#[derive(Default, Deserialize, Serialize, Clone)]
-pub struct Mods {
-    pub loaded_mods: Vec<ModName>,
-    pub unloaded_mods: Vec<ModName>,
-}
-
-#[derive(Default, Deserialize, Serialize, Clone)]
-pub struct ModName {
-    pub file_name: String,
-    pub user_name: String,
-}
-
-//TODO: rewrite function
 #[tauri::command]
 pub fn list_mods(state: State<ConfigState>) -> Result<Mods, String> {
-    let mut result: Mods = Mods::default();
+    let result: Mods;
     {
         let mut config = state.config.lock().map_err(|e| e.to_string())?;
         if !is_deadlock_path_valid(&config.deadlock_path) {
             return Err("Deadlock path is not valid".to_string());
         }
-        if config.deadlock_path == "" {
+        if config.deadlock_path.is_empty() {
             return Err("Deadlock path not set".to_string());
         }
+
         let mod_path = PathBuf::from(config.deadlock_path.clone())
             .join("game")
             .join("citadel")
             .join("addons");
         std::fs::create_dir_all(&mod_path).map_err(|e| e.to_string())?;
 
-        let regex = Regex::new(r"^pak\d\d_dir\.vpk").unwrap();
-        if mod_path.is_dir() {
-            //read everything in the directory
-            for entry in std::fs::read_dir(&mod_path).map_err(|e| e.to_string())? {
-                let entry = entry.map_err(|e| e.to_string())?;
-                //is it a file?
-                if entry.file_type().map_err(|e| e.to_string())?.is_file() {
-                    let name = entry.file_name().to_string_lossy().into_owned();
-                    //check if it matches the loaded nomenclature
-                    if regex.is_match(&name) {
-                        let mut user_name = "".to_string();
-                        if config.mod_names.contains_key(&name) {
-                            user_name = config.mod_names[&name].clone();
-                        } else {
-                            config.mod_names.insert(name.clone(), name.clone());
-                        }
-                        result.loaded_mods.push(ModName {
-                            user_name,
-                            file_name: entry.file_name().to_string_lossy().into_owned(),
-                        });
-                    } else if let Some(extension) = entry.path().extension() {
-                        //if not it must be unloaded
-                        //only if it is a vpk file
-                        if extension == "vpk" {
-                            let mut user_name = "".to_string();
-                            if config.mod_names.contains_key(&name) {
-                                user_name = config.mod_names[&name].clone();
-                            } else {
-                                config.mod_names.insert(name.clone(), name.clone());
-                            }
-                            result.unloaded_mods.push(ModName {
-                                user_name,
-                                file_name: entry.file_name().to_string_lossy().into_owned(),
-                            });
-                        }
-                    }
+        // Call the new function to get the Mods struct
+        let mods = process_mod_directory(&mod_path, &mut config)?;
+        result = mods;
+    }
+    save_config(&state).map_err(|e| e.to_string())?;
+    Ok(result)
+}
+
+fn process_mod_directory(mod_path: &Path, config: &mut ModManagerConfig) -> Result<Mods, String> {
+    let regex = Regex::new(VALID_MOD_REGEX).unwrap();
+    let mut result = Mods::default();
+
+    if mod_path.is_dir() {
+        for entry in std::fs::read_dir(mod_path).map_err(|e| e.to_string())? {
+            let entry = entry.map_err(|e| e.to_string())?;
+            if entry.file_type().map_err(|e| e.to_string())?.is_file() {
+                let name = entry.file_name().to_string_lossy().into_owned();
+
+                // Determine the user_name
+                let user_name = if let Some(existing_name) = config.mod_names.get(&name) {
+                    existing_name.clone()
+                } else {
+                    config.mod_names.insert(name.clone(), name.clone());
+                    name.clone()
+                };
+
+                let mod_name = ModName {
+                    user_name,
+                    file_name: entry.file_name().to_string_lossy().into_owned(),
+                };
+
+                if regex.is_match(&name) {
+                    result.loaded_mods.push(mod_name);
+                } else if entry.path().extension().map_or(false, |ext| ext == "vpk") {
+                    result.unloaded_mods.push(mod_name);
                 }
             }
         }
     }
-    save_config(&state).map_err(|e| e.to_string())?;
+
     Ok(result)
 }
 
