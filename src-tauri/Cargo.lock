@@ -809,24 +809,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "deadlock-mod-manager"
-version = "0.1.0"
-dependencies = [
- "memchr",
- "rand 0.8.5",
- "regex",
- "serde",
- "serde_json",
- "steamlocate",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-opener",
- "tauri-typegen",
- "valve_pak",
-]
-
-[[package]]
 name = "deranged"
 version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3568,6 +3550,24 @@ name = "simd-adler32"
 version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e320a6c5ad31d271ad523dcf3ad13e2767ad8b1cb8f047f75a8aeaf8da139da2"
+
+[[package]]
+name = "simple-deadlock-mod-manager"
+version = "0.1.0"
+dependencies = [
+    "memchr",
+    "rand 0.8.5",
+    "regex",
+    "serde",
+    "serde_json",
+    "steamlocate",
+    "tauri",
+    "tauri-build",
+    "tauri-plugin-dialog",
+    "tauri-plugin-opener",
+    "tauri-typegen",
+    "valve_pak",
+]
 
 [[package]]
 name = "siphasher"

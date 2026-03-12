@@ -9,7 +9,7 @@
         "height": 900,
         "minHeight": 500,
         "minWidth": 800,
-        "title": "deadlock-mod-manager",
+        "title": "Simple Deadlock Mod Manager",
         "width": 1600
       }
     ]
@@ -31,7 +31,7 @@
     ],
     "targets": "all"
   },
-  "identifier": "com.deadlock-mod-manager.app",
+  "identifier": "com.simple-deadlock-mod-manager.app",
   "plugins": {
     "typegen": {
       "excludePatterns": null,
@@ -46,6 +46,6 @@
       "visualizeDeps": false
     }
   },
-  "productName": "deadlock-mod-manager",
+  "productName": "simple-deadlock-mod-manager",
   "version": "0.1.0"
 }

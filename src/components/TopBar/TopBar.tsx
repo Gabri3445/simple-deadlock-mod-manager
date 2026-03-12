@@ -27,7 +27,7 @@ function TopBar() {
 
     return (
         <div className="w-full bg-topbar p-4 flex justify-between sticky top-0 z-10">
-            <h1 className="text-3xl block font-bold">Deadlock Mod Manager</h1>
+            <h1 className="text-3xl block font-bold">Simple Deadlock Mod Manager</h1>
             <div className="flex gap-4">
                 <Button onClick={onLoadModClick}>Load Mod</Button>
                 <Button onClick={handleOpenModal}>Options</Button>

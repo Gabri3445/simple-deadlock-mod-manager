@@ -1,5 +1,5 @@
 [package]
-name = "deadlock-mod-manager"
+name = "simple-deadlock-mod-manager"
 version = "0.1.0"
 description = "A Tauri App"
 authors = ["you"]
