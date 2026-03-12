@@ -8,7 +8,6 @@ interface SelectedMod {
     userName: string,
 }
 
-//TODO: add functions to change mods from loaded to unloaded
 interface ModsStore {
     mods: Mods,
     selectedMods: SelectedMod[],
