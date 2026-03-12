@@ -31,7 +31,7 @@ function TopBar() {
                 <Button onClick={handleOpenModal}>Options</Button>
                 <Options isOpen={openModal} onClose={handleCloseModal}/>
                 <Button onClick={async () => {
-                    await applyModChanges();
+                    await applyModChanges(); //TODO: auto apply button in settings
                 }}>Apply</Button>
             </div>
         </div>
