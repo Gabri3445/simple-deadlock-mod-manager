@@ -249,6 +249,7 @@ pub fn change_mod_name(
     Ok(user_name)
 }
 
+#[derive(Deserialize, Serialize)]
 pub enum Operation {
     LoadMods,
     UnloadMods,
