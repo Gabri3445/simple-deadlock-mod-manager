@@ -1,10 +1,11 @@
 use crate::config::{save_config, ConfigState, ModManagerConfig};
 use crate::types::{ModName, Mods, Operation};
+use crate::utils::{is_deadlock_path_valid, update_config_mod_name};
 use rand::Rng;
 use regex::Regex;
 use std::fs::DirEntry;
 use std::path::{Path, PathBuf};
-use std::sync::{Mutex, MutexGuard};
+use std::sync::Mutex;
 use tauri::State;
 
 const DEADLOCK_APP_ID: u32 = 1422450;
@@ -44,15 +45,6 @@ const FILESYSTEM_BLOCK_CONTENTS: &str = r#"FileSystem
 }"#;
 
 const VALID_MOD_REGEX: &str = r"^pak\d\d_dir\.vpk";
-
-//basic way to check if the path is valid
-fn is_deadlock_path_valid(deadlock_path: &String) -> bool {
-    let gameinfo_path = PathBuf::from(deadlock_path)
-        .join("game")
-        .join("citadel")
-        .join("gameinfo.gi");
-    return gameinfo_path.exists();
-}
 
 /// Get the path to the Deadlock game installation directory
 #[tauri::command]
@@ -235,22 +227,6 @@ pub fn change_mod_name(
     }
     save_config(&state).map_err(|e| e.to_string())?;
     Ok(user_name)
-}
-
-fn update_config_mod_name(
-    config: &mut MutexGuard<ModManagerConfig>,
-    mod_name: &ModName,
-    new_name: String,
-) {
-    if config.mod_names.remove(&mod_name.file_name).is_some() {
-        if mod_name.file_name == mod_name.user_name {
-            config.mod_names.insert(new_name.clone(), new_name);
-        } else {
-            config
-                .mod_names
-                .insert(new_name, mod_name.user_name.clone());
-        }
-    }
 }
 
 /*
