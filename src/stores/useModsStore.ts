@@ -1,4 +1,4 @@
-import {changeModName, listMods, Mods} from "../generated";
+import {applyChanges, changeModName, listMods, ModName, Mods, Operation} from "../generated";
 import {create} from "zustand";
 import {ModTabVariant} from "../components/ModTab/ModTab.tsx";
 
@@ -8,23 +8,63 @@ interface SelectedMod {
     userName: string,
 }
 
+interface ChangedMod {
+    operation: Operation,
+    fileName: string,
+    userName: string,
+}
+
 interface ModsStore {
     mods: Mods,
     selectedMods: SelectedMod[],
+    changedMods: ChangedMod[],
+    applyModChanges: () => Promise<void>,
     addSelectedMod: (mod: SelectedMod) => void,
     removeSelectedMod: (mod: SelectedMod) => void,
     changeModLoadStatus: (mods: SelectedMod[]) => void,
     setMods: (mods: Mods) => void;
-    getModsFromRust: () => Promise<Mods>;
+    getModsFromRust: () => Promise<Mods | null>;
     changeModName: (userName: string, fileName: string) => Promise<void>;
 }
 
-export const useModsStore = create<ModsStore>((set) => ({
+export const useModsStore = create<ModsStore>((set, get) => ({
     mods: {
         loaded_mods: [],
         unloaded_mods: []
     },
     selectedMods: [],
+    changedMods: [],
+    applyModChanges: async () => {
+        const state = get();
+
+        let changed = [...state.changedMods];
+
+        let modsToLoad = changed.filter((x) => x.operation === "LoadMods").map((x) => ({
+            file_name: x.fileName,
+            user_name: x.userName
+        })) as ModName[];
+        let modsToUnload = changed.filter((x) => x.operation === "UnloadMods").map((x) => ({
+            file_name: x.fileName,
+            user_name: x.userName
+        })) as ModName[];
+        let results: {
+            loaded_mods: { file_name: string; user_name: string; }[];
+            unloaded_mods: { file_name: string; user_name: string; }[];
+        };
+        if (modsToLoad.length > 0) {
+            results = await applyChanges({mods: modsToLoad, operation: "LoadMods"})
+        }
+        if (modsToUnload.length > 0) {
+            results = await applyChanges({mods: modsToUnload, operation: "UnloadMods"})
+        }
+
+        set(() => {
+            return {
+                mods: results,
+                changedMods: [],
+            }
+        })
+    },
     addSelectedMod: (mod: SelectedMod) => {
         set((s) => ({
             selectedMods: [...s.selectedMods, mod]
@@ -39,18 +79,45 @@ export const useModsStore = create<ModsStore>((set) => ({
         set((state) => {
             let loaded = [...state.mods.loaded_mods];
             let unloaded = [...state.mods.unloaded_mods];
+            let changed = [...state.changedMods];
 
             selectedMods.forEach((mod) => {
+                let operation: Operation;
+
                 if (mod.variant === ModTabVariant.LoadedMods) {
                     // move from loaded -> unloaded
                     loaded = loaded.filter(m => m.file_name !== mod.fileName);
                     const moved = state.mods.loaded_mods.find(m => m.file_name === mod.fileName);
                     if (moved) unloaded.push(moved);
+
+                    operation = "UnloadMods";
                 } else {
                     // move from unloaded -> loaded
                     unloaded = unloaded.filter(m => m.file_name !== mod.fileName);
                     const moved = state.mods.unloaded_mods.find(m => m.file_name === mod.fileName);
                     if (moved) loaded.push(moved);
+
+                    operation = "LoadMods";
+                }
+
+                const existingIndex = changed.findIndex( //check if we already have an operation on this mod
+                    c => c.fileName === mod.fileName
+                );
+
+                if (existingIndex === -1) { // -1 means not found
+                    changed.push({
+                        operation,
+                        fileName: mod.fileName,
+                        userName: mod.userName
+                    });
+                } else {
+                    const existing = changed[existingIndex];
+
+                    // opposite operation = cancel out
+                    if (existing.operation !== operation) {
+                        changed.splice(existingIndex, 1);
+                    }
+                    // same operation should not happen regardless
                 }
             });
 
@@ -59,13 +126,19 @@ export const useModsStore = create<ModsStore>((set) => ({
                     loaded_mods: loaded,
                     unloaded_mods: unloaded
                 },
-                selectedMods: []
+                changedMods: changed,
+                selectedMods: [] //reset selected mods, but keep changedMods
             };
         });
     },
     setMods: (mods: Mods) => set({mods: mods}),
     getModsFromRust: async () => {
-        return await listMods();
+        try {
+            return await listMods();
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
     },
     changeModName: async (userName: string, fileName: string) => {
         await changeModName({fileName, userName});
