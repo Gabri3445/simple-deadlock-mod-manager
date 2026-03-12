@@ -4,7 +4,7 @@ use std::env::home_dir;
 use std::path::PathBuf;
 use std::sync::Mutex;
 
-pub const CONFIG_PATH: &str = ".config/dmm/config.json";
+pub const CONFIG_PATH: &str = ".config/sdmm/config.json";
 
 #[derive(Default, Deserialize, Serialize, Clone)]
 pub struct ModManagerConfig {
