@@ -1,10 +1,9 @@
 use crate::config::{save_config, ConfigState, ModManagerConfig};
 use crate::types::{ModName, Mods, Operation};
-use crate::utils::{is_deadlock_path_valid, update_config_mod_name};
+use crate::utils::{is_deadlock_path_valid, process_mod_directory, update_config_mod_name};
 use rand::Rng;
-use regex::Regex;
 use std::fs::DirEntry;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::Mutex;
 use tauri::State;
 
@@ -44,7 +43,7 @@ const FILESYSTEM_BLOCK_CONTENTS: &str = r#"FileSystem
 	}
 }"#;
 
-const VALID_MOD_REGEX: &str = r"^pak\d\d_dir\.vpk";
+pub(crate) const VALID_MOD_REGEX: &str = r"^pak\d\d_dir\.vpk";
 
 /// Get the path to the Deadlock game installation directory
 #[tauri::command]
@@ -100,41 +99,6 @@ pub fn list_mods(state: State<ConfigState>) -> Result<Mods, String> {
         result = mods;
     }
     save_config(&state).map_err(|e| e.to_string())?;
-    Ok(result)
-}
-
-fn process_mod_directory(mod_path: &Path, config: &mut ModManagerConfig) -> Result<Mods, String> {
-    let regex = Regex::new(VALID_MOD_REGEX).unwrap();
-    let mut result = Mods::default();
-
-    if mod_path.is_dir() {
-        for entry in std::fs::read_dir(mod_path).map_err(|e| e.to_string())? {
-            let entry = entry.map_err(|e| e.to_string())?;
-            if entry.file_type().map_err(|e| e.to_string())?.is_file() {
-                let name = entry.file_name().to_string_lossy().into_owned();
-
-                // Determine the user_name
-                let user_name = if let Some(existing_name) = config.mod_names.get(&name) {
-                    existing_name.clone()
-                } else {
-                    config.mod_names.insert(name.clone(), name.clone());
-                    name.clone()
-                };
-
-                let mod_name = ModName {
-                    user_name,
-                    file_name: entry.file_name().to_string_lossy().into_owned(),
-                };
-
-                if regex.is_match(&name) {
-                    result.loaded_mods.push(mod_name);
-                } else if entry.path().extension().map_or(false, |ext| ext == "vpk") {
-                    result.unloaded_mods.push(mod_name);
-                }
-            }
-        }
-    }
-
     Ok(result)
 }
 
