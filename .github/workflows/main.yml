@@ -22,6 +22,11 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
@@ -46,6 +51,13 @@ jobs:
       - name: install frontend dependencies
         # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
         run: pnpm install # change this to npm or pnpm depending on which one you use.
+
+      - name: Install tauri-typegen
+        run: cargo install tauri-typegen
+        
+      - name: generate tauri-typegen bindings
+        run: cargo tauri-typegen generate
+        working-directory: src-tauri
 
       - uses: tauri-apps/tauri-action@v0
         env:
