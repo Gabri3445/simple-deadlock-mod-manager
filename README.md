@@ -18,7 +18,7 @@ A lightweight mod manager for **Deadlock**.
 
 ## Not Planned
 
-- Automatic mod updates (Please see [Deadlock Mod Loader](https://github.com/Tylevo/DeadlockModManager) or [Deadlock mod manager](https://github.com/deadlock-mod-manager/deadlock-mod-manager) if you want your mods to update automatically)
+- Automatic mod updates (Please see [Deadlock Mod Loader](https://github.com/Tylevo/DeadlockModManager) or [Deadlock Mod Manager](https://github.com/deadlock-mod-manager/deadlock-mod-manager) if you want your mods to update automatically)
 
 ## Usage
 
