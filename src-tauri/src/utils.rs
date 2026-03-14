@@ -63,6 +63,5 @@ pub fn process_mod_directory(
             }
         }
     }
-
     Ok(result)
 }
