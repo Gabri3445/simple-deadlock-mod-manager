@@ -1,13 +1,6 @@
 @import "tailwindcss";
 
 @font-face {
-    font-family: "Black Han Sans";
-    font-style: normal;
-    font-weight: 400;
-    src: url("./fonts/blackhansans-regular.ttf") format("truetype");
-}
-
-@font-face {
     font-family: "Retail Demo";
     font-style: normal;
     font-weight: 400;
