@@ -20,6 +20,8 @@ jobs:
             args: ''
 
     runs-on: ${{ matrix.platform }}
+    env:
+      NO_STRIP: TRUE
     steps:
       - uses: actions/checkout@v4
       
