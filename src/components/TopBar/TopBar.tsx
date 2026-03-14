@@ -5,20 +5,26 @@ import Options from "../Options/Options.tsx";
 import {useState} from "react";
 import {useModsStore} from "../../stores/useModsStore.ts";
 import {useErrorStore} from "../../stores/useErrorStore.ts";
+import {copyModToGame} from "../../generated";
 
 function TopBar() {
 
-    const {applyModChanges} = useModsStore();
+    const {applyModChanges, getModsFromRust, setMods} = useModsStore();
     const {setError, setVisible} = useErrorStore();
 
     const onLoadModClick = async (): Promise<void> => {
         // @ts-ignore
-        const file = await open({
+        const files = await open({
             multiple: true,
             directory: false,
             defaultPath: await downloadDir()
         })
-        //TODO: pass to rust and copy to game mod folder
+        if (files) {
+            for (const file of files) {
+                await copyModToGame({path: file})
+            }
+            setMods(await getModsFromRust());
+        }
     }
 
     const [openModal, setOpenModal] = useState<boolean>(false)
