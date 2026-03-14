@@ -62,7 +62,7 @@ jobs:
         run: pnpm install # change this to npm or pnpm depending on which one you use.
 
       - name: Install tauri-typegen
-        run: cargo install cargo-tauri-typegen
+        run: cargo install tauri-typegen
         
       - name: generate tauri-typegen bindings
         run: cargo tauri-typegen generate
