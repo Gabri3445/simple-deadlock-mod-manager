@@ -14,16 +14,21 @@ function TopBar() {
 
     const onLoadModClick = async (): Promise<void> => {
         // @ts-ignore
-        const files = await open({
-            multiple: true,
-            directory: false,
-            defaultPath: await downloadDir()
-        })
-        if (files) {
-            for (const file of files) {
-                await copyModToGame({path: file})
+        try {
+            const files = await open({
+                multiple: true,
+                directory: false,
+                defaultPath: await downloadDir()
+            })
+            if (files) {
+                for (const file of files) {
+                    await copyModToGame({path: file})
+                }
+                setMods(await getModsFromRust());
             }
-            setMods(await getModsFromRust());
+        } catch (error) {
+            setVisible(true);
+            setError(error as string);
         }
     }
 
