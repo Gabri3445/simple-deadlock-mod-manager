@@ -6,6 +6,7 @@ import {useEffect, useState} from "react";
 import LoadModButtons from "./components/LoadModButtons/LoadModButtons.tsx";
 import ErrorSnackbar from "./components/ErrorSnackbar/ErrorSnackbar.tsx";
 import {useErrorStore} from "./stores/useErrorStore.ts";
+import DragDrop from "./components/DragDrop/DragDrop.tsx";
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
                 <LoadModButtons/>
                 <ModTab variant={ModTabVariant.LoadedMods} mods={mods.loaded_mods} loading={loading}/>
             </div>
+            <DragDrop />
             <ErrorSnackbar/>
         </main>
     );
