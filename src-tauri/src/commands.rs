@@ -77,6 +77,7 @@ pub fn change_path(path: String, state: State<ConfigState>) -> Result<String, St
     Ok(path)
 }
 
+//Todo: clear deleted mods from config
 #[tauri::command]
 pub fn list_mods(state: State<ConfigState>) -> Result<Mods, String> {
     let result: Mods;
