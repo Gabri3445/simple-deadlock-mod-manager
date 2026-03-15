@@ -10,6 +10,7 @@ import {
 } from "../../generated";
 import {useModsStore} from "../../stores/useModsStore.ts";
 import {useErrorStore} from "../../stores/useErrorStore.ts";
+import {open} from "@tauri-apps/plugin-dialog";
 
 function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
     const {setVisible, setError} = useErrorStore();
@@ -63,6 +64,25 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
             setError(e as string);
         }
     }
+
+    const onBrowseClick = async () => {
+        try {
+            const dir = await open({
+                multiple: false,
+                directory: true,
+            })
+            if (dir) {
+                setPath(dir);
+                await changePath({path: dir})
+                setValidConfig(await checkGameinfoValidity())
+                setMods(await getModsFromRust());
+            }
+        } catch (e) {
+            setVisible(true);
+            setError(e as string);
+        }
+    }
+
     return (
         <Modal onClose={onClose} open={isOpen}>
             <div className="absolute top-1/2 left-1/2 -translate-1/2 w-2/4 h-2/3 bg-darkBlue rounded-md">
@@ -78,8 +98,8 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
                                         <label className="block mb-2" htmlFor="pathInput">
                                             Deadlock Path
                                         </label>
-                                        <div className="flex">
-                                            <div className="bg-gray-800 grow mr-20"><input id="pathInput" value={path}
+                                        <div className="flex gap-4">
+                                            <div className="bg-gray-800 grow mr-9"><input id="pathInput" value={path}
                                                                                            onChange={(e) => {
                                                                                                setPath(e.target.value)
                                                                                            }}
@@ -97,6 +117,9 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
                                                                                            }}
                                                                                            className="text-lg m-1 w-full mr-1"/>
                                             </div>
+                                            <Button onClick={onBrowseClick}>
+                                                Browse
+                                            </Button>
                                             <Button onClick={onAutoDetectClick}>
                                                 Auto-Detect
                                             </Button>
