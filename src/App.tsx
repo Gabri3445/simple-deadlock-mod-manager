@@ -32,7 +32,7 @@ function App() {
     return (
         <main className="flex h-screen flex-col">
             <TopBar/>
-            <div className="flex flex-1">
+            <div className="flex flex-1 gap-4">
                 <ModTab variant={ModTabVariant.UnloadedMods} mods={mods.unloaded_mods} loading={loading}/>
                 <LoadModButtons/>
                 <ModTab variant={ModTabVariant.LoadedMods} mods={mods.loaded_mods} loading={loading}/>
