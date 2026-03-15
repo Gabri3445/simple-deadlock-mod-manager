@@ -77,7 +77,6 @@ pub fn change_path(path: String, state: State<ConfigState>) -> Result<String, St
     Ok(path)
 }
 
-//Todo: clear deleted mods from config
 #[tauri::command]
 pub fn list_mods(state: State<ConfigState>) -> Result<Mods, String> {
     let result: Mods;
@@ -96,8 +95,19 @@ pub fn list_mods(state: State<ConfigState>) -> Result<Mods, String> {
             .join("addons");
         std::fs::create_dir_all(&mod_path).map_err(|e| e.to_string())?;
 
-        // Call the new function to get the Mods struct
         let mods = process_mod_directory(&mod_path, &mut config)?;
+        for mod_name in config.mod_names.clone().keys().clone() {
+            let mut present = false;
+            if mods.unloaded_mods.contains(&ModName {file_name: mod_name.clone(), user_name: "".to_string() }) {
+                present = true
+            }
+            if mods.loaded_mods.contains(&ModName {file_name: mod_name.clone(), user_name: "".to_string() }) {
+                present = true
+            }
+            if !present {
+                config.mod_names.remove(mod_name);
+            }
+        }
         result = mods;
     }
     save_config(&state).map_err(|e| e.to_string())?;

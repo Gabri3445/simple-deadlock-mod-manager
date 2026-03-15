@@ -12,6 +12,12 @@ pub struct ModName {
     pub user_name: String,
 }
 
+impl PartialEq for ModName {
+    fn eq(&self, other: &ModName) -> bool {
+        self.file_name.eq(&other.file_name)
+    }
+}
+
 #[derive(Deserialize, Serialize)]
 pub enum Operation {
     LoadMods,
