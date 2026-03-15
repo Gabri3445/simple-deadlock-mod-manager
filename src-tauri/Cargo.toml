@@ -29,4 +29,6 @@ tauri-plugin-dialog = "2"
 regex = "1.12.3"
 memchr = "2.8.0"
 rand = "0.8.5"
+unrar = "0.5.8"
+zip = "8.2.0"
 
