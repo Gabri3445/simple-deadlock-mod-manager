@@ -275,7 +275,7 @@ pub fn apply_changes(
                         if mod_to_unload.file_name
                             == entry.file_name().to_string_lossy().to_string()
                         {
-                            let random_prefix = rng.gen_range(0..9999);
+                            let random_prefix = rng.gen_range(0..999999);
                             let new_name = format!(
                                 "{}_{}",
                                 random_prefix,
