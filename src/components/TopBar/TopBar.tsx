@@ -13,7 +13,6 @@ function TopBar() {
     const {setError, setVisible} = useErrorStore();
 
     const onModAddClick = async (): Promise<void> => {
-        // @ts-ignore
         try {
             const files = await open({
                 multiple: true,
