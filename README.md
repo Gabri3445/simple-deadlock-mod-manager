@@ -12,7 +12,8 @@ A lightweight mod manager for **Deadlock**.
 
 ## Planned Features
 
-- [ ] Load `.vpk` files directly from `.zip` archives
+- [ ] Deleting mods
+- [ ] Load `.vpk` files directly from `.zip` or `.rar` archives
 - [ ] Download mods directly from **GameBanana**
 - [ ] Drag and drop
 
@@ -43,13 +44,13 @@ If the mod manager fails to start, try deleting the config file located at `$HOM
 - **Windows:** Not tested, but should work.
 
 ## Tech stack
-- [![Tauri](https://img.shields.io/badge/Tauri-000000?logo=tauri)]()
-- [![Rust](https://img.shields.io/badge/Rust-000000?logo=rust)]()
-- [![React](https://img.shields.io/badge/React-000000?logo=react)]()
-- [![Vite](https://img.shields.io/badge/Vite-000000?logo=vite)]()
-- [![Tailwind](https://img.shields.io/badge/Tailwind-000000?logo=tailwindcss)]()
-- [![Mui](https://img.shields.io/badge/MaterialUI-000000?logo=mui)]()
-- [![Zustand](https://img.shields.io/badge/Zustand-000000)]()
+- ![Tauri](https://img.shields.io/badge/Tauri-000000?logo=tauri)
+- ![Rust](https://img.shields.io/badge/Rust-000000?logo=rust)
+- ![React](https://img.shields.io/badge/React-000000?logo=react)
+- ![Vite](https://img.shields.io/badge/Vite-000000?logo=vite)
+- ![Tailwind](https://img.shields.io/badge/Tailwind-000000?logo=tailwindcss)
+- ![Mui](https://img.shields.io/badge/MaterialUI-000000?logo=mui)
+- ![Zustand](https://img.shields.io/badge/Zustand-000000)
 
 
 ## Building from source
