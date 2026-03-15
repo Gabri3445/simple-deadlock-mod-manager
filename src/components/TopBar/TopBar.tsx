@@ -12,7 +12,7 @@ function TopBar() {
     const {applyModChanges, getModsFromRust, setMods} = useModsStore();
     const {setError, setVisible} = useErrorStore();
 
-    const onLoadModClick = async (): Promise<void> => {
+    const onModAddClick = async (): Promise<void> => {
         // @ts-ignore
         try {
             const files = await open({
@@ -40,7 +40,7 @@ function TopBar() {
         <div className="w-full bg-topbar p-4 flex justify-between sticky top-0 z-10">
             <h1 className="text-3xl block font-bold">Simple Deadlock Mod Manager</h1>
             <div className="flex gap-4">
-                <Button onClick={onLoadModClick}>Load Mod</Button>
+                <Button onClick={onModAddClick}>Add Mod</Button>
                 <Button onClick={handleOpenModal}>Options</Button>
                 <Options isOpen={openModal} onClose={handleCloseModal}/>
                 <Button onClick={async () => {
