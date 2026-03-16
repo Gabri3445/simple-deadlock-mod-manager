@@ -4,13 +4,16 @@ import {Textfit} from "react-textfit";
 import Button from "../Button/Button.tsx";
 import {useErrorStore} from "../../stores/useErrorStore.ts";
 import {deleteMod} from "../../generated";
+import {useModsStore} from "../../stores/useModsStore.ts";
 
 function DeleteModal() {
     const {modalOpen, setModalOpen, fileName, userName} = useDeleteStore();
+    const {setMods, getModsFromRust} = useModsStore()
     const {setError, setVisible} = useErrorStore();
     const onDeleteClick = async () => {
         try {
             await deleteMod({fileName: fileName});
+            setMods(await getModsFromRust());
         } catch (e) {
             setVisible(true);
             setError(e as string);
