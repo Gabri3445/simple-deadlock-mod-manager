@@ -98,10 +98,16 @@ pub fn list_mods(state: State<ConfigState>) -> Result<Mods, String> {
         let mods = process_mod_directory(&mod_path, &mut config)?;
         for file_name in config.mod_names.clone().keys().clone() {
             let mut present = false;
-            if mods.unloaded_mods.contains(&ModName {file_name: file_name.clone(), user_name: "".to_string() }) {
+            if mods.unloaded_mods.contains(&ModName {
+                file_name: file_name.clone(),
+                user_name: "".to_string(),
+            }) {
                 present = true
             }
-            if mods.loaded_mods.contains(&ModName {file_name: file_name.clone(), user_name: "".to_string() }) {
+            if mods.loaded_mods.contains(&ModName {
+                file_name: file_name.clone(),
+                user_name: "".to_string(),
+            }) {
                 present = true
             }
             if !present {
@@ -337,4 +343,24 @@ pub fn copy_mod_to_game(path: String, state: State<ConfigState>) -> Result<ModNa
         user_name: "".to_string(),
         file_name: "".to_string(),
     })
+}
+
+#[tauri::command]
+pub fn delete_mod(file_name: String, state: State<ConfigState>) -> Result<(), String> {
+    let config = state.config.lock().map_err(|e| e.to_string())?;
+    if !is_deadlock_path_valid(&config.deadlock_path) {
+        return Err("Deadlock path is not valid".to_string());
+    }
+    let mod_path = PathBuf::from(config.deadlock_path.clone())
+        .join("game")
+        .join("citadel")
+        .join("addons")
+        .join(&file_name);
+
+    if !mod_path.exists() {
+        return Err(format!("File {} does not exist", mod_path.to_string_lossy()));
+    }
+
+    std::fs::remove_file(mod_path).map_err(|e| e.to_string())?;
+    Ok(())
 }
