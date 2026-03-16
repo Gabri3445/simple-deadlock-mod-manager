@@ -7,8 +7,8 @@
     "windows": [
       {
         "height": 900,
-        "minHeight": 500,
-        "minWidth": 800,
+        "minHeight": 800,
+        "minWidth": 1200,
         "title": "Simple Deadlock Mod Manager",
         "width": 1600
       }
