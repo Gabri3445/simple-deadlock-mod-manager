@@ -12,7 +12,7 @@ function TopBar() {
     const {applyModChanges, getModsFromRust, setMods} = useModsStore();
     const {setError, setVisible} = useErrorStore();
 
-    const onModAddClick = async (): Promise<void> => {
+    const onModAddClick = async (): Promise<void> => { //Todo: if file is a zip/rar and has multiple files, open a modal to choose which ones to load
         try {
             const files = await open({
                 multiple: true,
