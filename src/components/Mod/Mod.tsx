@@ -5,16 +5,24 @@ import {useModsStore} from "../../stores/useModsStore.ts";
 import {ModTabVariant} from "../ModTab/ModTab.tsx";
 import {useErrorStore} from "../../stores/useErrorStore.ts";
 import {DeleteForever} from "@mui/icons-material";
+import {useDeleteStore} from "../../stores/useDeleteStore.ts";
 
 function Mod({modName, fileName, variant}: { modName: string, fileName: string, variant: ModTabVariant }) {
     const {setVisible, setError} = useErrorStore();
     const colors = ["bg-gunItem", "bg-vitalityItem", "bg-spiritItem"];
-    const {changeModName, addSelectedMod, removeSelectedMod, selectedMods} = useModsStore()
+    const {changeModName, addSelectedMod, removeSelectedMod, selectedMods} = useModsStore();
+    const {setFileName, setUserName, setModalOpen} = useDeleteStore();
 
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(modName);
 
     const [color] = useState(colors[Math.floor(Math.random() * colors.length)]);
+
+    const onDeleteClick = () => {
+        setUserName(modName);
+        setFileName(fileName);
+        setModalOpen(true);
+    }
 
     return (
         <div
@@ -55,7 +63,7 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
                 <div onDoubleClick={() => setIsEditing(true)} className={"w-full text-center px-2"}>
                     <Tooltip title={"Double click to edit name"}>
                         <div>
-                            <Textfit mode={"single"} max={25}>
+                            <Textfit mode={"multi"} max={25}>
                                 {value}
                             </Textfit>
                         </div>
@@ -89,7 +97,8 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
             </div>
             <div className="absolute top-2 left-2">
                 <button
-                    className="bg-red-800/80 hover:bg-red-800 active:bg-red-950 transition-colors duration-200 rounded-lg p-0.5">
+                    className="bg-red-800/80 hover:bg-red-800 active:bg-red-950 transition-colors duration-200 rounded-lg p-0.5"
+                onClick={onDeleteClick}>
                     <DeleteForever htmlColor={"#FFFFFF"}/></button>
             </div>
         </div>

@@ -7,6 +7,7 @@ import LoadModButtons from "./components/LoadModButtons/LoadModButtons.tsx";
 import ErrorSnackbar from "./components/ErrorSnackbar/ErrorSnackbar.tsx";
 import {useErrorStore} from "./stores/useErrorStore.ts";
 import DragDrop from "./components/DragDrop/DragDrop.tsx";
+import DeleteModal from "./components/DeleteModal/DeleteModal.tsx";
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
         <main className="flex h-screen flex-col">
             <TopBar/>
             <div className="flex flex-1 gap-4">
+                <DeleteModal />
                 <ModTab variant={ModTabVariant.UnloadedMods} mods={mods.unloaded_mods} loading={loading}/>
                 <LoadModButtons/>
                 <ModTab variant={ModTabVariant.LoadedMods} mods={mods.loaded_mods} loading={loading}/>
