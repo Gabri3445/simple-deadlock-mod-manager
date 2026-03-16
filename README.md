@@ -25,7 +25,7 @@ A lightweight mod manager for **Deadlock**.
 
 - Open the options menu to set the path to your deadlock installation.
 - Make sure the gameinfo.gi file is valid.
-- Use the **Load Mod** button in the top right and select the mods you wish to use
+- Use the **Add Mod** button in the top right and select the mods you wish to use
 - (Optional) Double-click the names to change them
 - Select the mods you wish to load and use the `>>` button to load them and the `<<` button to unload them
 - Click **Apply**
