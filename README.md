@@ -9,13 +9,11 @@ A lightweight mod manager for **Deadlock**.
 - [x] Automatic **Deadlock** path detection
 - [x] Automatically fixes/updates `gameinfo.gi` to keep it valid
 - [x] Enable and disable mods easily
-
-## Planned Features
-
-- [ ] Deleting mods
+- [x] Deleting mods
+- [x] Drag and drop
 - [ ] Load `.vpk` files directly from `.zip` or `.rar` archives
 - [ ] Download mods directly from **GameBanana**
-- [ ] Drag and drop
+
 
 ## Not Planned
 
@@ -25,7 +23,7 @@ A lightweight mod manager for **Deadlock**.
 
 - Open the options menu to set the path to your deadlock installation.
 - Make sure the gameinfo.gi file is valid.
-- Use the **Add Mod** button in the top right and select the mods you wish to use
+- Use the **Add Mod** button in the top right or drag and drop the file anywhere in the window.
 - (Optional) Double-click the names to change them
 - Select the mods you wish to load and use the `>>` button to load them and the `<<` button to unload them
 - Click **Apply**
@@ -54,6 +52,8 @@ If the mod manager fails to start, try deleting the config file located at `$HOM
 
 
 ## Building from source
+Please see https://v2.tauri.app/start/prerequisites/
+
 You might need to set `NO_STRIP=TRUE` if you're building an AppImage.
 ```shell
 git clone https://github.com/Gabri3445/simple-deadlock-mod-manager.git # Clone the repo
