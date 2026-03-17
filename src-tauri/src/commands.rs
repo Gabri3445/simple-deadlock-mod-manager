@@ -96,6 +96,7 @@ pub fn list_mods(state: State<ConfigState>) -> Result<Mods, String> {
         std::fs::create_dir_all(&mod_path).map_err(|e| e.to_string())?;
 
         let mods = process_mod_directory(&mod_path, &mut config)?;
+        // this removes mods which have been deleted from the config
         for file_name in config.mod_names.clone().keys().clone() {
             let mut present = false;
             if mods.unloaded_mods.contains(&ModName {
@@ -137,6 +138,8 @@ pub fn check_gameinfo_validity(state: State<ConfigState>) -> Result<bool, String
     ))
 }
 
+/// Searches for the filesystem block and replaces it with a valid one for loading mods
+//todo: should not replace it if it is already valid
 #[tauri::command]
 pub fn make_config_valid(state: State<ConfigState>) -> Result<(), String> {
     let config = state.config.lock().map_err(|e| e.to_string())?;
@@ -211,14 +214,18 @@ pub fn change_mod_name(
     Ok(user_name)
 }
 
-/*
-This function takes in the which mods should be changed.
-It will then rename mods that have been unloaded to ****pak**_dir.vpk
-If the user has not specified a custom name for it then rename them to the new file name (****pak**_dir.vpk) else keep the user name for it
-For mods that have been loaded it will rename them to pak**dir.vpk
-Again if they do not have a custom name (check by comparing the user name and the file name) just rename to the new name or keep the custom one
-Finally it should save the config with the modified file names
-*/
+
+/// This function takes in the which mods should be changed.
+///
+/// It will then rename mods that have been unloaded to ****pak**_dir.vpk
+///
+/// If the user has not specified a custom name for it then rename them to the new file name (****pak**_dir.vpk) else keep the user name for it
+///
+/// For mods that have been loaded it will rename them to pak**dir.vpk
+///
+/// Again if they do not have a custom name (check by comparing the user name and the file name) just rename to the new name or keep the custom one
+///
+/// Finally it should save the config with the modified file names
 #[tauri::command]
 pub fn apply_changes(
     mods: Vec<ModName>,
@@ -301,6 +308,9 @@ pub fn apply_changes(
     Ok(discovered_mods)
 }
 
+/// This copies the vpk file to the addons folder
+/// It will load the mod in a unloaded state
+/// It does so by adding a random prefix at the start of the name (same as apply_changes)
 #[tauri::command]
 pub fn copy_mod_to_game(path: String, state: State<ConfigState>) -> Result<ModName, String> {
     let config = state.config.lock().map_err(|e| e.to_string())?;

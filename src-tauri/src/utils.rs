@@ -29,6 +29,8 @@ pub fn is_deadlock_path_valid(deadlock_path: &String) -> bool {
     gameinfo_path.exists()
 }
 
+/// Returns a list of Mods (see types.rs)
+/// Mods that match the VALID_MOD_REGEX (see commands.rs) get put in the loaded_mods array
 pub fn process_mod_directory(
     mod_path: &Path,
     config: &mut ModManagerConfig,
@@ -40,22 +42,22 @@ pub fn process_mod_directory(
         for entry in std::fs::read_dir(mod_path).map_err(|e| e.to_string())? {
             let entry = entry.map_err(|e| e.to_string())?;
             if entry.file_type().map_err(|e| e.to_string())?.is_file() {
-                let name = entry.file_name().to_string_lossy().into_owned();
+                let file_name = entry.file_name().to_string_lossy().into_owned();
 
-                // Determine the user_name
-                let user_name = if let Some(existing_name) = config.mod_names.get(&name) {
-                    existing_name.clone()
-                } else {
-                    config.mod_names.insert(name.clone(), name.clone());
-                    name.clone()
+                // If the user has specified a name then load that
+                let user_name = if let Some(existing_user_name) = config.mod_names.get(&file_name) {
+                    existing_user_name.clone()
+                } else { // otherwise set the user name the same as the file name
+                    config.mod_names.insert(file_name.clone(), file_name.clone());
+                    file_name.clone()
                 };
 
                 let mod_name = ModName {
                     user_name,
-                    file_name: entry.file_name().to_string_lossy().into_owned(),
+                    file_name: file_name.clone(),
                 };
 
-                if regex.is_match(&name) {
+                if regex.is_match(&file_name) {
                     result.loaded_mods.push(mod_name);
                 } else if entry.path().extension().map_or(false, |ext| ext == "vpk") {
                     result.unloaded_mods.push(mod_name);
