@@ -85,7 +85,7 @@ function Options({isOpen, onClose}: { isOpen: boolean, onClose: () => void }) {
 
     return (
         <Modal onClose={onClose} open={isOpen}>
-            <div className="absolute top-1/2 left-1/2 -translate-1/2 w-2/4 h-2/3 bg-darkBlue rounded-md">
+            <div className="absolute top-1/2 left-1/2 -translate-1/2 w-2/4 h-2/3 bg-darkBlue rounded-md min-w-160">
                 <div className="mx-8 h-full">
                     <div className="flex flex-col justify-between h-full">
                         <div>
