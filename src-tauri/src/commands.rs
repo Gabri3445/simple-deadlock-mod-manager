@@ -1,7 +1,7 @@
 use crate::config::{save_config, ConfigState, ModManagerConfig};
 use crate::types::{ModName, Mods, Operation};
 use crate::utils::{is_deadlock_path_valid, process_mod_directory, update_config_mod_name};
-use rand::Rng;
+use rand::{RngExt};
 use regex::bytes::Regex;
 use std::fs::DirEntry;
 use std::path::PathBuf;
@@ -225,7 +225,7 @@ pub fn apply_changes(
     operation: Operation,
     state: State<ConfigState>,
 ) -> Result<Mods, String> {
-    let mut discovered_mods = Mods::default();
+    let discovered_mods: Mods;
     {
         let mut config = state.config.lock().map_err(|e| e.to_string())?;
         if !is_deadlock_path_valid(&config.deadlock_path) {
@@ -275,13 +275,13 @@ pub fn apply_changes(
             }
             Operation::UnloadMods => {
                 //add random 4 numbers to start
-                let mut rng = rand::thread_rng();
+                let mut rng = rand::rng();
                 for mod_to_unload in mods {
                     for entry in &mods_dir_entries {
                         if mod_to_unload.file_name
                             == entry.file_name().to_string_lossy().to_string()
                         {
-                            let random_prefix = rng.gen_range(0..999999);
+                            let random_prefix = rng.random_range(0..999999);
                             let new_name = format!(
                                 "{}_{}",
                                 random_prefix,
@@ -319,8 +319,8 @@ pub fn copy_mod_to_game(path: String, state: State<ConfigState>) -> Result<ModNa
     let mut fname = fpath.file_name().unwrap().to_string_lossy().into_owned();
     let regex = Regex::new(VALID_MOD_REGEX).unwrap();
     if regex.is_match(fname.as_ref()) {
-        let mut rng = rand::thread_rng();
-        let random_prefix = rng.gen_range(0..9999);
+        let mut rng = rand::rng();
+        let random_prefix = rng.random_range(0..9999);
         fname = format!("{}_{}", random_prefix, fname)
     }
     let mut addon_path = PathBuf::from(config.deadlock_path.clone())
@@ -329,8 +329,8 @@ pub fn copy_mod_to_game(path: String, state: State<ConfigState>) -> Result<ModNa
         .join("addons")
         .join(&fname);
     if addon_path.exists() {
-        let mut rng = rand::thread_rng();
-        let random_prefix = rng.gen_range(0..9999);
+        let mut rng = rand::rng();
+        let random_prefix = rng.random_range(0..9999);
         fname = format!("{}_{}", random_prefix, fname);
         addon_path = PathBuf::from(config.deadlock_path.clone())
             .join("game")
