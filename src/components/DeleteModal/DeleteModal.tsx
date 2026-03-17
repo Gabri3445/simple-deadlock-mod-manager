@@ -23,7 +23,7 @@ function DeleteModal() {
     }
     return (
         <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-            <div className="absolute top-1/2 left-1/2 -translate-1/2 w-2/8 h-2/14 bg-darkBlue rounded-md">
+            <div className="absolute top-1/2 left-1/2 -translate-1/2 w-2/8 h-2/14 bg-darkBlue rounded-md min-w-100 min-h-30">
                 <div className="flex flex-col justify-around h-full w-full">
                     <div className="text-center w-full">
                         <Textfit mode={"multi"} >
