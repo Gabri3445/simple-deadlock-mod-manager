@@ -6,11 +6,13 @@ import {useState} from "react";
 import {useModsStore} from "../../stores/useModsStore.ts";
 import {useErrorStore} from "../../stores/useErrorStore.ts";
 import processFiles from "../../utils/files.ts";
+import {useFileSelectStore} from "../../stores/useFileSelectStore.ts";
 
 
 function TopBar() {
 
     const {applyModChanges, getModsFromRust, setMods} = useModsStore();
+    const {setModalOpen, setFilePaths} = useFileSelectStore();
     const {setError, setVisible} = useErrorStore();
 
     const onModAddClick = async (): Promise<void> => { //Todo: if file is a zip/rar and has multiple files, open a modal to choose which ones to load
@@ -32,7 +34,7 @@ function TopBar() {
             })
 
             if (files) {
-                await processFiles(files);
+                await processFiles({files, setFilePaths, setFileSelectModalOpen: setModalOpen});
                 setMods(await getModsFromRust());
             }
         } catch (error) {
