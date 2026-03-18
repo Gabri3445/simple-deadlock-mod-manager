@@ -1,16 +1,16 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env::home_dir;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
-
-pub const CONFIG_PATH: &str = ".config/sdmm/config.json";
+use directories::ProjectDirs;
 
 /*
 todo: could link each mod to a gamebanana link to check for updates
 another hashmap with <file name, gamebanana link>
 if the mod is not linked the value should be ""
  */
+//add versioning
 #[derive(Default, Deserialize, Serialize, Clone)]
 pub struct ModManagerConfig {
     pub deadlock_path: String,
@@ -38,10 +38,10 @@ pub fn save_config(
 }
 
 pub fn load_config() -> Result<ModManagerConfig, Box<dyn std::error::Error>> {
-    //add versioning
-    let path = home_dir()
-        .ok_or("Unable to locate home directory")?
-        .join(CONFIG_PATH);
+    let mut path = PathBuf::new();
+    if let Some(proj_dirs) = ProjectDirs::from("", "sdmm", "sdmm") {
+        path = proj_dirs.config_dir().to_path_buf().join("config.json");
+    }
     if !path.exists() {
         let default_config = ModManagerConfig::default();
         save_config(&ConfigState {

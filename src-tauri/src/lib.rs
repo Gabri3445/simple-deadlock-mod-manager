@@ -1,8 +1,9 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
-use crate::config::{load_config, ConfigState, CONFIG_PATH};
+use crate::config::{load_config, ConfigState};
 use std::env::home_dir;
 use std::sync::Mutex;
+use directories::ProjectDirs;
 use tauri::Manager;
 
 mod commands;
@@ -14,14 +15,23 @@ mod utils;
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            let config = load_config()?;
+            if let Some(proj_dirs) = ProjectDirs::from("", "sdmm", "sdmm") {
+                let config_dir = proj_dirs.config_dir().join("config.json");
+                let config = load_config()?;
+                app.manage(ConfigState {
+                    path: config_dir,
+                    config: Mutex::new(config),
+                });
+            };
+
+            /*
             let path = home_dir()
                 .ok_or("Unable to locate home directory")?
                 .join(CONFIG_PATH);
             app.manage(ConfigState {
                 path,
                 config: Mutex::new(config),
-            });
+            });*/
             Ok(())
         })
         .plugin(tauri_plugin_dialog::init())
