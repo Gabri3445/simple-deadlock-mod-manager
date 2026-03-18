@@ -11,7 +11,7 @@ A lightweight mod manager for **Deadlock**.
 - [x] Enable and disable mods easily
 - [x] Deleting mods
 - [x] Drag and drop
-- [ ] Load `.vpk` files directly from `.zip` or `.rar` archives
+- [x] Load `.vpk` files directly from `.zip` or `.rar` archives
 - [ ] Download mods directly from **GameBanana**
 
 
