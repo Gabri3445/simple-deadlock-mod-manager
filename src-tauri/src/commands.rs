@@ -8,6 +8,7 @@ use regex::bytes::Regex;
 use std::fs::DirEntry;
 use std::path::PathBuf;
 use tauri::State;
+use unrar::Archive;
 
 const DEADLOCK_APP_ID: u32 = 1422450;
 
@@ -401,7 +402,23 @@ pub fn process_compressed_file(
                 list_vpk_files(extract_path, &mut result).map_err(|e| e.to_string())?;
             }
             CompressedFileType::Rar => {
-                return Err("Not implemented yet".to_string());
+                let extract_path = cache_dir.join(f_path.file_name().unwrap());
+                let mut archive = Archive::new(&f_path)
+                    .open_for_processing()
+                    .map_err(|e| e.to_string())?;
+                if extract_path.exists() {
+                    std::fs::remove_dir_all(&extract_path).map_err(|e| e.to_string())?;
+                }
+                while let Some(header) = archive.read_header().map_err(|e| e.to_string())? {
+                    archive = if header.entry().is_file() {
+                        header
+                            .extract_with_base(&extract_path)
+                            .map_err(|e| e.to_string())?
+                    } else {
+                        header.skip().map_err(|e| e.to_string())?
+                    };
+                }
+                list_vpk_files(extract_path, &mut result).map_err(|e| e.to_string())?;
             }
         };
     } else {
