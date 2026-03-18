@@ -3,12 +3,10 @@ use crate::types::{CompressedFileType, ModName, Mods, Operation};
 use crate::utils::{
     is_deadlock_path_valid, list_vpk_files, process_mod_directory, update_config_mod_name,
 };
-use directories::ProjectDirs;
 use rand::RngExt;
 use regex::bytes::Regex;
 use std::fs::DirEntry;
 use std::path::PathBuf;
-use std::sync::Mutex;
 use tauri::State;
 
 const DEADLOCK_APP_ID: u32 = 1422450;
@@ -385,12 +383,10 @@ pub fn delete_mod(file_name: String, state: State<ConfigState>) -> Result<(), St
 pub fn process_compressed_file(
     path: String,
     f_type: CompressedFileType,
+    state: State<ConfigState>,
 ) -> Result<Vec<String>, String> {
     let mut result: Vec<String> = Vec::new();
-    let cache_dir = match ProjectDirs::from("", "", "") {
-        Some(dir) => dir.cache_dir().to_path_buf(),
-        _ => Err(String::from("Could not find cache_dir"))?,
-    };
+    let cache_dir = &state.cache_path;
     let f_path = PathBuf::from(path);
     if f_path.exists() {
         match f_type {
