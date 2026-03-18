@@ -15,7 +15,7 @@ A lightweight mod manager for **Deadlock**.
 - [ ] Download mods directly from **GameBanana**
 
 
-## Not Planned
+## Not Planned (For now)
 
 - Automatic mod updates (Please see [Deadlock Mod Loader](https://github.com/Tylevo/DeadlockModManager) or [Deadlock Mod Manager](https://github.com/deadlock-mod-manager/deadlock-mod-manager) if you want your mods to update automatically)
 

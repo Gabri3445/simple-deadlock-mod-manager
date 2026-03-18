@@ -6,6 +6,11 @@ use std::sync::Mutex;
 
 pub const CONFIG_PATH: &str = ".config/sdmm/config.json";
 
+/*
+todo: could link each mod to a gamebanana link to check for updates
+another hashmap with <file name, gamebanana link>
+if the mod is not linked the value should be ""
+ */
 #[derive(Default, Deserialize, Serialize, Clone)]
 pub struct ModManagerConfig {
     pub deadlock_path: String,
