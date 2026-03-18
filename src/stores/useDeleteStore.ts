@@ -1,6 +1,6 @@
 import {create} from "zustand";
 
-interface UseDeleteStore {
+interface DeleteStore {
     fileName: string;
     setFileName: (fileName: string) => void;
     userName: string;
@@ -9,7 +9,7 @@ interface UseDeleteStore {
     setModalOpen: (modalOpen: boolean) => void;
 }
 
-export const useDeleteStore = create<UseDeleteStore>((set) => ({
+export const useDeleteStore = create<DeleteStore>((set) => ({
     fileName: "",
     setFileName: (fileName) => {
         set({fileName})
