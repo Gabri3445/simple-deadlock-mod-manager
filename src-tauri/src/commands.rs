@@ -70,13 +70,11 @@ pub fn get_config(state: State<ConfigState>) -> Result<ModManagerConfig, String>
 
 #[tauri::command]
 pub fn change_path(path: String, state: State<ConfigState>) -> Result<String, String> {
-    let mut config = state.config.lock().map_err(|e| e.to_string())?;
-    config.deadlock_path = path.clone();
-    save_config(&ConfigState {
-        path: state.path.clone(),
-        config: Mutex::new(config.clone()),
-    })
-    .map_err(|e| e.to_string())?;
+    {
+        let mut config = state.config.lock().map_err(|e| e.to_string())?;
+        config.deadlock_path = path.clone();
+    }
+    save_config(&state).map_err(|e| e.to_string())?;
     Ok(path)
 }
 
