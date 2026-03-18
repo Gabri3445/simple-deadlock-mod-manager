@@ -3,8 +3,8 @@ import {copyModToGame, processCompressedFile} from "../generated";
 
 interface ProcessFilesArguments {
     files: string[];
-    setFileSelectModalOpen: (modalOpen: boolean) => void;
-    setFilePaths: (fileNames: string[]) => void;
+    setFileSelectModalOpen?: (modalOpen: boolean) => void;
+    setFilePaths?: (fileNames: string[]) => void;
 }
 
 export default async function processFiles({files, setFilePaths, setFileSelectModalOpen}: ProcessFilesArguments) {
@@ -26,8 +26,10 @@ export default async function processFiles({files, setFilePaths, setFileSelectMo
                         if (filePaths.length === 1) {
                             await copyModToGame({path: filePaths[1]});
                         } else {
-                            setFileSelectModalOpen(true);
-                            setFilePaths(filePaths);
+                            if (setFileSelectModalOpen && setFilePaths) {
+                                setFileSelectModalOpen(true);
+                                setFilePaths(filePaths);
+                            }
                         }
                         return;
                     }
@@ -36,8 +38,10 @@ export default async function processFiles({files, setFilePaths, setFileSelectMo
                         if (filePaths.length === 1) {
                             await copyModToGame({path: filePaths[1]});
                         } else {
-                            setFileSelectModalOpen(true);
-                            setFilePaths(filePaths);
+                            if (setFileSelectModalOpen && setFilePaths) {
+                                setFileSelectModalOpen(true);
+                                setFilePaths(filePaths);
+                            }
                         }
                         return;
                     }
