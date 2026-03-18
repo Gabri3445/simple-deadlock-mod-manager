@@ -23,3 +23,9 @@ pub enum Operation {
     LoadMods,
     UnloadMods,
 }
+
+#[derive(Deserialize, Serialize)]
+pub enum CompressedFileType {
+    Zip,
+    Rar,
+}

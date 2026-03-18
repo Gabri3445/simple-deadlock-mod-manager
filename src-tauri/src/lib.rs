@@ -1,9 +1,8 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
 use crate::config::{load_config, ConfigState};
-use std::env::home_dir;
-use std::sync::Mutex;
 use directories::ProjectDirs;
+use std::sync::Mutex;
 use tauri::Manager;
 
 mod commands;
@@ -46,7 +45,8 @@ pub fn run() {
             commands::change_mod_name,
             commands::apply_changes,
             commands::copy_mod_to_game,
-            commands::delete_mod
+            commands::delete_mod,
+            commands::process_compressed_file
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

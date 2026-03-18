@@ -1,7 +1,10 @@
 use crate::config::{save_config, ConfigState, ModManagerConfig};
-use crate::types::{ModName, Mods, Operation};
-use crate::utils::{is_deadlock_path_valid, process_mod_directory, update_config_mod_name};
-use rand::{RngExt};
+use crate::types::{CompressedFileType, ModName, Mods, Operation};
+use crate::utils::{
+    is_deadlock_path_valid, list_vpk_files, process_mod_directory, update_config_mod_name,
+};
+use directories::ProjectDirs;
+use rand::RngExt;
 use regex::bytes::Regex;
 use std::fs::DirEntry;
 use std::path::PathBuf;
@@ -214,7 +217,6 @@ pub fn change_mod_name(
     Ok(user_name)
 }
 
-
 /// This function takes in the which mods should be changed.
 ///
 /// It will then rename mods that have been unloaded to ****pak**_dir.vpk
@@ -368,9 +370,48 @@ pub fn delete_mod(file_name: String, state: State<ConfigState>) -> Result<(), St
         .join(&file_name);
 
     if !mod_path.exists() {
-        return Err(format!("File {} does not exist", mod_path.to_string_lossy()));
+        return Err(format!(
+            "File {} does not exist",
+            mod_path.to_string_lossy()
+        ));
     }
 
     std::fs::remove_file(mod_path).map_err(|e| e.to_string())?;
     Ok(())
+}
+
+/// Takes in a path of a zip file or rar file
+/// It will then extract every file to the cache folder
+/// And will return an array of paths to those files
+#[tauri::command]
+pub fn process_compressed_file(
+    path: String,
+    f_type: CompressedFileType,
+) -> Result<Vec<String>, String> {
+    let mut result: Vec<String> = Vec::new();
+    let cache_dir = match ProjectDirs::from("", "", "") {
+        Some(dir) => dir.cache_dir().to_path_buf(),
+        _ => Err(String::from("Could not find cache_dir"))?,
+    };
+    let f_path = PathBuf::from(path);
+    if f_path.exists() {
+        match f_type {
+            CompressedFileType::Zip => {
+                let zip_file = std::fs::File::open(&f_path).map_err(|e| e.to_string())?;
+                let mut archive = zip::ZipArchive::new(zip_file).map_err(|e| e.to_string())?;
+                let extract_path = cache_dir.join(f_path.file_name().unwrap());
+                if extract_path.exists() {
+                    std::fs::remove_dir_all(&extract_path).map_err(|e| e.to_string())?;
+                }
+                archive.extract(&extract_path).map_err(|e| e.to_string())?;
+                list_vpk_files(extract_path, &mut result).map_err(|e| e.to_string())?;
+            }
+            CompressedFileType::Rar => {
+                return Err("Not implemented yet".to_string());
+            }
+        };
+    } else {
+        return Err(format!("File {} does not exist", f_path.to_string_lossy()));
+    }
+    Ok(result)
 }

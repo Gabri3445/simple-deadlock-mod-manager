@@ -47,8 +47,11 @@ pub fn process_mod_directory(
                 // If the user has specified a name then load that
                 let user_name = if let Some(existing_user_name) = config.mod_names.get(&file_name) {
                     existing_user_name.clone()
-                } else { // otherwise set the user name the same as the file name
-                    config.mod_names.insert(file_name.clone(), file_name.clone());
+                } else {
+                    // otherwise set the user name the same as the file name
+                    config
+                        .mod_names
+                        .insert(file_name.clone(), file_name.clone());
                     file_name.clone()
                 };
 
@@ -66,4 +69,21 @@ pub fn process_mod_directory(
         }
     }
     Ok(result)
+}
+
+pub fn list_vpk_files(path: PathBuf, result: &mut Vec<String>) -> Result<(), String> {
+    if path.is_dir() {
+        for entry in std::fs::read_dir(path).map_err(|e| e.to_string())? {
+            let entry = entry.map_err(|e| e.to_string())?;
+            let path = entry.path();
+            if path.is_dir() {
+                list_vpk_files(path, result)?;
+            } else {
+                if path.extension().map_or(false, |ext| ext == "vpk") {
+                    result.push(path.to_string_lossy().into_owned());
+                }
+            }
+        }
+    };
+    Ok(())
 }
