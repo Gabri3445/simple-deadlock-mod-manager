@@ -32,7 +32,7 @@ A lightweight mod manager for **Deadlock**.
 
 This app is still early in development and while it should not mess anything up, I would recommend backing up your mods every so often. <br>
 If deadlock fails to start due to a corrupt gameinfo.gi file simply verify the integrity of the game files through steam. (Make sure to revalidate the file if you want mods to load)<br>
-If the mod manager fails to start, try deleting the config file located at `$HOME/.config/sddm/config.json`
+If the mod manager fails to start, try deleting the config file located at `$HOME/.config/sdmm/config.json`
 
 
 
