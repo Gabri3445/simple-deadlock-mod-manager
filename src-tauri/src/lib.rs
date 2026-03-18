@@ -16,9 +16,11 @@ pub fn run() {
         .setup(|app| {
             if let Some(proj_dirs) = ProjectDirs::from("", "sdmm", "sdmm") {
                 let config_dir = proj_dirs.config_dir().join("config.json");
+                let cache_dir = proj_dirs.cache_dir();
                 let config = load_config()?;
                 app.manage(ConfigState {
-                    path: config_dir,
+                    config_path: config_dir,
+                    cache_path: cache_dir.to_path_buf(),
                     config: Mutex::new(config),
                 });
             };
