@@ -5,7 +5,8 @@ import Options from "../Options/Options.tsx";
 import {useState} from "react";
 import {useModsStore} from "../../stores/useModsStore.ts";
 import {useErrorStore} from "../../stores/useErrorStore.ts";
-import {copyModToGame} from "../../generated";
+import processFiles from "../../utils/files.ts";
+
 
 function TopBar() {
 
@@ -31,19 +32,7 @@ function TopBar() {
             })
 
             if (files) {
-                const extensions = files.map(file => {
-                    const parts = file.split('.');
-                    return parts.length > 1 ? parts.pop() : null;
-                });
-                if (extensions.length > 0) {
-                    for (let i = 0; i < files.length; i++) {
-                        if (extensions[i] === "vpk") {
-                            await copyModToGame({path: files[i]});
-                        } else if (extensions[i] === "zip" || extensions[i] === "rar") {
-                            //todo: rust command
-                        }
-                    }
-                }
+                await processFiles(files);
                 setMods(await getModsFromRust());
             }
         } catch (error) {
