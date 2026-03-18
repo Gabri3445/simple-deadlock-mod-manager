@@ -17,11 +17,32 @@ function TopBar() {
             const files = await open({
                 multiple: true,
                 directory: false,
-                defaultPath: await downloadDir()
+                defaultPath: await downloadDir(),
+                filters: [
+                    {
+                        name: "Vpk files",
+                        extensions: ["vpk"]
+                    },
+                    {
+                        name: "Compressed files",
+                        extensions: ["zip", "rar"]
+                    }
+                ]
             })
+
             if (files) {
-                for (const file of files) {
-                    await copyModToGame({path: file})
+                const extensions = files.map(file => {
+                    const parts = file.split('.');
+                    return parts.length > 1 ? parts.pop() : null;
+                });
+                if (extensions.length > 0) {
+                    for (let i = 0; i < files.length; i++) {
+                        if (extensions[i] === "vpk") {
+                            await copyModToGame({path: files[i]});
+                        } else if (extensions[i] === "zip" || extensions[i] === "rar") {
+                            //todo: rust command
+                        }
+                    }
                 }
                 setMods(await getModsFromRust());
             }
