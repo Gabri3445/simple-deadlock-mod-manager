@@ -1,6 +1,7 @@
 # Simple Deadlock Mod Manager
 
 [![AUR](https://img.shields.io/aur/version/simple-deadlock-mod-manager?logo=archlinux)](https://aur.archlinux.org/packages/simple-deadlock-mod-manager/)
+[![AUR-GIT](https://img.shields.io/aur/version/simple-deadlock-mod-manager-git?logo=archlinux)](https://aur.archlinux.org/packages/simple-deadlock-mod-manager-git/)
 ![Trans Ware](https://pride-badges.pony.workers.dev/static/v1?label=Trans%20Ware&stripeWidth=6&stripeColors=5BCEFA,F5A9B8,FFFFFF,F5A9B8,5BCEFA)
 
 A lightweight mod manager for **Deadlock**.
