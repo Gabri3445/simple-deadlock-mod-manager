@@ -65,7 +65,8 @@ Go to the [Releases Page](https://github.com/Gabri3445/simple-deadlock-mod-manag
 
 This app is still early in development and while it should not mess anything up, I would recommend backing up your mods every so often. <br>
 If deadlock fails to start due to a corrupt gameinfo.gi file simply verify the integrity of the game files through steam. (Make sure to revalidate the file if you want mods to load)<br>
-If the mod manager fails to start, try deleting the config file located at `$HOME/.config/sdmm/config.json`
+If the mod manager fails to start, try deleting the config file located at `$HOME/.config/sdmm/config.json` or
+`C:/Users/<username>/AppData/Roaming/sdmm`
 
 
 
