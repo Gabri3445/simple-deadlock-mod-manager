@@ -1,6 +1,39 @@
 # Simple Deadlock Mod Manager
 
+[![AUR](https://img.shields.io/aur/version/simple-deadlock-mod-manager)](https://aur.archlinux.org/packages/simple-deadlock-mod-manager/)
+![Trans Ware](https://pride-badges.pony.workers.dev/static/v1?label=Trans%20Ware&stripeWidth=6&stripeColors=5BCEFA,F5A9B8,FFFFFF,F5A9B8,5BCEFA)
+
 A lightweight mod manager for **Deadlock**.
+
+## Installation
+
+Go to the [Releases Page](https://github.com/Gabri3445/simple-deadlock-mod-manager/releases)
+
+### Windows:
+
+- Download either `simple-deadlock-mod-manager_x.x.x_x64-setup.exe` or `simple-deadlock-mod-manager_0.3.0_x64_en-US.msi`
+- A portable version is also available with `simple-deadlock-mod-manager.exe`
+
+### Linux
+
+#### Debian Based (using dpkg/apt)
+
+- Download `simple-deadlock-mod-manager_x.x.x_amd64.deb`
+- Run `sudo apt install ./simple-deadlock-mod-manager_x.x.x_amd64.deb`
+
+#### Red Hat (using rpm, yum)
+
+- Download `simple-deadlock-mod-manager-x.x.x-x.x86_64.rpm`
+- Run `sudo yum install simple-deadlock-mod-manager-x.x.x-x.x86_64.rpm`
+
+#### Arch (using pacman/yay/paru)
+
+- Run `yay -S simple-deadlock-mod-manager`
+
+#### All of the above and any other distro
+
+- Download simple-deadlock-mod-manager_x.x.x_amd64.AppImage
+- Run `./simple-deadlock-mod-manager_x.x.x_amd64.AppImage`
 
 ## Features
 
