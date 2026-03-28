@@ -1,4 +1,6 @@
 use crate::config::{save_config, ConfigState, ModManagerConfig};
+use crate::gamebanana_api::api::{download_mod, get_mod_files};
+use crate::gamebanana_api::types::FileEntry;
 use crate::types::{CompressedFileType, ModName, Mods, Operation};
 use crate::utils::{
     is_deadlock_path_valid, list_vpk_files, process_mod_directory, update_config_mod_name,
@@ -9,6 +11,7 @@ use std::fs::DirEntry;
 use std::path::PathBuf;
 use tauri::State;
 use unrar::Archive;
+use url::Url;
 
 const DEADLOCK_APP_ID: u32 = 1422450;
 
@@ -425,4 +428,51 @@ pub fn process_compressed_file(
         return Err(format!("File {} does not exist", f_path.to_string_lossy()));
     }
     Ok(result)
+}
+
+pub async fn download_mod_command(
+    url: String,
+    state: State<'_, ConfigState>,
+) -> Result<Vec<String>, String> {
+    let cache_dir = &state.cache_path;
+    if let Some(id) = Url::parse(&url)
+        .map_err(|e| e.to_string())?
+        .path_segments()
+        .and_then(|segments| segments.last())
+    {
+        let files = get_mod_files(id).await.map_err(|e| e.to_string())?;
+        let mut values = files.files.iter().map(|x| x.1).collect::<Vec<&FileEntry>>();
+        values.sort_by_key(|x1| x1.date_added);
+        values.reverse();
+        let mut newest_files: Vec<&FileEntry> = Vec::new();
+        for i in 0..values.len() {
+            if i == 0 {
+                newest_files.push(values[i]);
+                continue;
+            }
+            if values[i - 1].version == values[i].version {
+                newest_files.push(values[i]);
+                continue;
+            } else {
+                break;
+            }
+        }
+        let paths: Vec<String> = Vec::new();
+        for newest_file in newest_files {
+            let path = cache_dir.join(newest_file.file.clone());
+            if path.exists() {
+                std::fs::remove_file(&path).map_err(|e| e.to_string())?;
+            }
+            std::fs::write(
+                path,
+                download_mod(&*newest_file.download_url)
+                    .await
+                    .map_err(|e| e.to_string())?,
+            )
+            .map_err(|e| e.to_string())?;
+        }
+        Ok(paths)
+    } else {
+        Err(format!("Invalid URL: {}", url))
+    }
 }
