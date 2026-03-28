@@ -31,4 +31,5 @@ rand = "0.10.0"
 unrar = "0.5.8"
 zip = "8.2.0"
 directories = "6.0.0"
+reqwest = "0.13.2"
 
