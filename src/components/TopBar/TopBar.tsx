@@ -1,46 +1,19 @@
 import Button from "../Button/Button.tsx";
-import {open} from "@tauri-apps/plugin-dialog";
-import {downloadDir} from "@tauri-apps/api/path";
 import Options from "../Options/Options.tsx";
 import {useState} from "react";
 import {useModsStore} from "../../stores/useModsStore.ts";
 import {useErrorStore} from "../../stores/useErrorStore.ts";
-import processFiles from "../../utils/files.ts";
-import {useFileSelectStore} from "../../stores/useFileSelectStore.ts";
+import AddModModal from "../AddMod/AddModModal.tsx";
 
 
 function TopBar() {
 
-    const {applyModChanges, getModsFromRust, setMods} = useModsStore();
-    const {setModalOpen, setFilePaths} = useFileSelectStore();
+    const {applyModChanges} = useModsStore();
     const {setError, setVisible} = useErrorStore();
+    const [addModModalOpen, setAddModModalOpen] = useState(false);
 
     const onModAddClick = async (): Promise<void> => {
-        try {
-            const files = await open({
-                multiple: true,
-                directory: false,
-                defaultPath: await downloadDir(),
-                filters: [
-                    {
-                        name: "Vpk files",
-                        extensions: ["vpk"]
-                    },
-                    {
-                        name: "Compressed files",
-                        extensions: ["zip", "rar"]
-                    }
-                ]
-            })
-
-            if (files) {
-                await processFiles({files, setFilePaths, setFileSelectModalOpen: setModalOpen});
-                setMods(await getModsFromRust());
-            }
-        } catch (error) {
-            setVisible(true);
-            setError(error as string);
-        }
+        setAddModModalOpen(true);
     }
 
     const [openModal, setOpenModal] = useState<boolean>(false)
@@ -52,6 +25,7 @@ function TopBar() {
             <h1 className="text-3xl block font-bold">Simple Deadlock Mod Manager</h1>
             <div className="flex gap-4">
                 <Button onClick={onModAddClick}>Add Mod</Button>
+                <AddModModal modalOpen={addModModalOpen} setModalOpen={setAddModModalOpen}/>
                 <Button onClick={handleOpenModal}>Options</Button>
                 <Options isOpen={openModal} onClose={handleCloseModal}/>
                 <Button onClick={async () => {
