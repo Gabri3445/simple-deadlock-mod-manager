@@ -37,6 +37,8 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
         } catch (error) {
             setVisible(true);
             setError(error as string);
+        } finally {
+            setModalOpen(false);
         }
     }
 
