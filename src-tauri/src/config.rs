@@ -47,7 +47,7 @@ pub fn load_config() -> Result<ModManagerConfig, Box<dyn std::error::Error>> {
     let mut cache_path = PathBuf::new();
     if let Some(proj_dirs) = ProjectDirs::from("", "sdmm", "sdmm") {
         config_path = proj_dirs.config_dir().to_path_buf().join("config.json");
-        std::fs::create_dir_all(&config_path)?;
+        std::fs::create_dir_all(proj_dirs.config_dir().to_path_buf())?;
         cache_path = proj_dirs.cache_dir().to_path_buf();
         std::fs::create_dir_all(&cache_path)?;
     }
