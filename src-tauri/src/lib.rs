@@ -7,6 +7,7 @@ use tauri::Manager;
 
 mod commands;
 mod config;
+mod gamebanana_api;
 mod types;
 mod utils;
 
