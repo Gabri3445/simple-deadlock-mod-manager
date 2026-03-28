@@ -429,6 +429,7 @@ pub fn process_compressed_file(
     Ok(result)
 }
 
+#[tauri::command]
 pub async fn download_mod_command(
     url: String,
     state: State<'_, ConfigState>,

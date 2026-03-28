@@ -49,7 +49,8 @@ pub fn run() {
             commands::apply_changes,
             commands::copy_mod_to_game,
             commands::delete_mod,
-            commands::process_compressed_file
+            commands::process_compressed_file,
+            commands::download_mod_command
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
