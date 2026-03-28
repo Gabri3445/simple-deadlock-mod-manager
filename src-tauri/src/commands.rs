@@ -247,6 +247,7 @@ pub fn apply_changes(
             .join("game")
             .join("citadel")
             .join("addons");
+        std::fs::create_dir_all(&mod_path).map_err(|e| e.to_string())?;
         let mut mods_dir_entries = Vec::<DirEntry>::new();
         if mod_path.is_dir() {
             for entry in std::fs::read_dir(&mod_path).map_err(|e| e.to_string())? {
@@ -328,6 +329,11 @@ pub fn copy_mod_to_game(path: String, state: State<ConfigState>) -> Result<ModNa
             return Err("Mod file must be a vpk".to_string());
         }
     }
+    let addons_path = PathBuf::from(config.deadlock_path.clone())
+        .join("game")
+        .join("citadel")
+        .join("addons");
+    std::fs::create_dir_all(&addons_path).map_err(|e| e.to_string())?;
     let mut fname = fpath.file_name().unwrap().to_string_lossy().into_owned();
     let regex = Regex::new(VALID_MOD_REGEX).unwrap();
     if regex.is_match(fname.as_ref()) {
@@ -335,22 +341,15 @@ pub fn copy_mod_to_game(path: String, state: State<ConfigState>) -> Result<ModNa
         let random_prefix = rng.random_range(0..9999);
         fname = format!("{}_{}", random_prefix, fname)
     }
-    let mut addon_path = PathBuf::from(config.deadlock_path.clone())
-        .join("game")
-        .join("citadel")
-        .join("addons")
-        .join(&fname);
-    if addon_path.exists() {
+    let mut mod_path = addons_path.join(&fname);
+
+    if mod_path.exists() {
         let mut rng = rand::rng();
         let random_prefix = rng.random_range(0..9999);
         fname = format!("{}_{}", random_prefix, fname);
-        addon_path = PathBuf::from(config.deadlock_path.clone())
-            .join("game")
-            .join("citadel")
-            .join("addons")
-            .join(&fname);
+        mod_path = addons_path.join(&fname);
     }
-    std::fs::copy(fpath, addon_path).map_err(|e| e.to_string())?;
+    std::fs::copy(fpath, mod_path).map_err(|e| e.to_string())?;
     Ok(ModName {
         user_name: "".to_string(),
         file_name: "".to_string(),
