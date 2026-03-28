@@ -4070,7 +4070,7 @@ dependencies = [
  "tauri-plugin-opener",
  "tauri-typegen",
  "unrar",
-    "url",
+ "url",
  "valve_pak",
  "zip",
 ]

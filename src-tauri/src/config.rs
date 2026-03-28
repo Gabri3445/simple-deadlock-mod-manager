@@ -9,11 +9,16 @@ todo: could link each mod to a gamebanana link to check for updates
 another hashmap with <file name, gamebanana link>
 if the mod is not linked the value should be ""
  */
-//add versioning
 #[derive(Default, Deserialize, Serialize, Clone)]
 pub struct ModManagerConfig {
+    #[serde(default = "v1_version_default")]
+    pub version: String,
     pub deadlock_path: String,
     pub mod_names: HashMap<String, String>,
+}
+
+fn v1_version_default() -> String {
+    "1".to_string()
 }
 
 pub struct ConfigState {
