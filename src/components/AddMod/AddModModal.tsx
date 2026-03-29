@@ -6,11 +6,14 @@ import {downloadDir} from "@tauri-apps/api/path";
 import processFiles from "../../utils/files.ts";
 import {useModsStore} from "../../stores/useModsStore.ts";
 import {useFileSelectStore} from "../../stores/useFileSelectStore.ts";
+import {useState} from "react";
+import {downloadModCommand} from "../../generated";
 
 function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOpen: (open: boolean) => void }) {
     const {setVisible, setError} = useErrorStore();
     const {getModsFromRust, setMods} = useModsStore();
     const {setFilePaths} = useFileSelectStore();
+    const [downloadUrl, setDownloadUrl] = useState("");
 
     const onBrowseButtonClick = async () => {
         try {
@@ -42,10 +45,24 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
         }
     }
 
+    const onDownloadButtonClick = async () => {
+        try {
+            if (downloadUrl !== "") {
+                let paths = await downloadModCommand({url: downloadUrl});
+                console.log(paths);
+            }
+        } catch (error) {
+            setVisible(true);
+            setError(error as string);
+        } finally {
+            setModalOpen(false);
+        }
+    }
+
     return (
         <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
             <div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/4 h-2/4 bg-darkBlue rounded-md min-w-160 min-h-100 flex flex-col">
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/4 h-2/8 bg-darkBlue rounded-md min-w-160 min-h-100 flex flex-col">
                 <div className="mt-8 mx-8">
                     <div className="font-bold text-3xl">Add a mod</div>
                 </div>
@@ -58,9 +75,14 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
                         Download from GameBanana
                         <div className="flex">
                             <div className="bg-gray-800 grow mr-2">
-                                <input className="text-lg m-1 w-full mr-2" type={"text"}/>
+                                <input className="text-lg m-1 w-full mr-2" type={"text"}
+                                       onChange={(e) => setDownloadUrl(e.currentTarget.value)} onKeyDown={async (e) => {
+                                    if (e.key === "Enter") {
+                                        await onDownloadButtonClick();
+                                    }
+                                }}/>
                             </div>
-                            <Button>Download</Button>
+                            <Button onClick={onDownloadButtonClick}>Download</Button>
                         </div>
 
                     </div>
