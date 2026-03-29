@@ -41,7 +41,7 @@ pub async fn download_mod(url: &str, app: AppHandle) -> Result<Vec<u8>, String> 
 
         downloaded += chunk.len() as u64;
         data.extend_from_slice(&chunk);
-        let progress = downloaded as f64 / size as f64;
+        let progress = (downloaded as f64 / size as f64) * 100.0;
 
         app.emit(
             "download-progress",
