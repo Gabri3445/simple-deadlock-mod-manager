@@ -37,7 +37,7 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
 
     //download start
     const downloadStartRegistered = useRef(false);
-    const [isDownloading, setIsDownloading] = useState(true);
+    const [isDownloading, setIsDownloading] = useState(false);
     const [numberOfFiles, setNumberOfFiles] = useState(0);
     useEffect(() => {
         if (downloadStartRegistered.current) return;
@@ -115,10 +115,21 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
         }
     }
 
+    const onModalClose = () => {
+        if (isDownloading) return;
+        setDownloadUrl("");
+        downloadProgressRegistered.current = false;
+        setDownloadProgress(0);
+        downloadStartRegistered.current = false;
+        setIsDownloading(false);
+        setNumberOfFiles(0);
+        downloadEndRegistered.current = false;
+        setNumberOfFilesCompleted(0);
+        setModalOpen(false);
+    }
+
     return (
-        <Modal open={modalOpen} onClose={() => {
-            if (!isDownloading) setModalOpen(false);
-        }}>
+        <Modal open={modalOpen} onClose={onModalClose}>
             <div
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/4 h-2/8 bg-darkBlue rounded-md min-w-160 min-h-100 flex flex-col">
                 <div className="mt-8 mx-8">
@@ -153,9 +164,7 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
                     </div>
                 </div>
                 <div className="mb-4 mx-4 flex justify-between">
-                    <Button onClick={() => {
-                        if (!isDownloading) setModalOpen(false);
-                    }}>Cancel</Button>
+                    <Button onClick={onModalClose}>Cancel</Button>
                 </div>
             </div>
         </Modal>
