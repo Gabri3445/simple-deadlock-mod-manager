@@ -111,7 +111,7 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
             setVisible(true);
             setError(error as string);
         } finally {
-            setModalOpen(false);
+            onModalClose();
         }
     }
 
