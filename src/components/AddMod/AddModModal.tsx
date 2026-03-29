@@ -9,12 +9,14 @@ import {useFileSelectStore} from "../../stores/useFileSelectStore.ts";
 import {useEffect, useRef, useState} from "react";
 import {downloadModCommand, onDownloadEnd, onDownloadProgress, onDownloadStart} from "../../generated";
 import {UnlistenFn} from "@tauri-apps/api/event";
+import {useLoadingStore} from "../../stores/useLoadingStore.ts";
 
 function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOpen: (open: boolean) => void }) {
     const {setVisible, setError} = useErrorStore();
     const {getModsFromRust, setMods} = useModsStore();
     const {setFilePaths} = useFileSelectStore();
     const [downloadUrl, setDownloadUrl] = useState("");
+    const {setIsLoading} = useLoadingStore();
 
 
     //download progress
@@ -90,8 +92,10 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
             })
 
             if (files) {
+                setIsLoading(true);
                 await processFiles({files, setFilePaths, setFileSelectModalOpen: setModalOpen});
                 setMods(await getModsFromRust());
+                setIsLoading(false);
             }
         } catch (error) {
             setVisible(true);
@@ -105,8 +109,10 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
         try {
             if (downloadUrl !== "") {
                 let paths = await downloadModCommand({url: downloadUrl});
+                setIsLoading(true);
                 await processFiles({files: paths, setFilePaths, setFileSelectModalOpen: setModalOpen});
                 setMods(await getModsFromRust());
+                setIsLoading(false);
             }
         } catch (error) {
             setVisible(true);

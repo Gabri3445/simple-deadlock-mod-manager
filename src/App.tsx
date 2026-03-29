@@ -9,6 +9,7 @@ import {useErrorStore} from "./stores/useErrorStore.ts";
 import DragDrop from "./components/DragDrop/DragDrop.tsx";
 import DeleteModal from "./components/DeleteModal/DeleteModal.tsx";
 import FileSelectModal from "./components/FileSelect/FileSelectModal.tsx";
+import LoadingSnackBar from "./components/LoadingSnackbar/LoadingSnackBar.tsx";
 
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
             <DragDrop />
             <FileSelectModal/>
             <ErrorSnackbar/>
+            <LoadingSnackBar/>
         </main>
     );
 }
