@@ -9,7 +9,7 @@ use rand::RngExt;
 use regex::bytes::Regex;
 use std::fs::DirEntry;
 use std::path::PathBuf;
-use tauri::State;
+use tauri::{AppHandle, State};
 use unrar::Archive;
 use url::Url;
 
@@ -433,6 +433,7 @@ pub fn process_compressed_file(
 pub async fn download_mod_command(
     url: String,
     state: State<'_, ConfigState>,
+    app: AppHandle,
 ) -> Result<Vec<String>, String> {
     let cache_dir = &state.cache_path;
     if let Some(id) = Url::parse(&url)
@@ -457,19 +458,20 @@ pub async fn download_mod_command(
                 break;
             }
         }
-        let paths: Vec<String> = Vec::new();
+        let mut paths: Vec<String> = Vec::new();
         for newest_file in newest_files {
             let path = cache_dir.join(newest_file.file.clone());
             if path.exists() {
                 std::fs::remove_file(&path).map_err(|e| e.to_string())?;
             }
             std::fs::write(
-                path,
-                download_mod(&*newest_file.download_url)
+                &path,
+                download_mod(&*newest_file.download_url, app.clone())
                     .await
                     .map_err(|e| e.to_string())?,
             )
             .map_err(|e| e.to_string())?;
+            paths.push(path.to_string_lossy().to_string());
         }
         Ok(paths)
     } else {
