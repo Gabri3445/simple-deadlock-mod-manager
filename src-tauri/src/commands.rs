@@ -7,9 +7,10 @@ use crate::utils::{
 };
 use rand::RngExt;
 use regex::bytes::Regex;
+use serde::Serialize;
 use std::fs::DirEntry;
 use std::path::PathBuf;
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Emitter, State};
 use unrar::Archive;
 use url::Url;
 
@@ -429,6 +430,19 @@ pub fn process_compressed_file(
     Ok(result)
 }
 
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct DownloadStart {
+    number_of_files: u64,
+    file_ids: Vec<u64>,
+}
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct DownloadEnd {
+    id: u64,
+}
+
 #[tauri::command]
 pub async fn download_mod_command(
     url: String,
@@ -459,6 +473,18 @@ pub async fn download_mod_command(
             }
         }
         let mut paths: Vec<String> = Vec::new();
+        let file_ids: Result<Vec<u64>, _> = newest_files
+            .iter()
+            .map(|x| x.id_row.parse::<u64>())
+            .collect();
+        app.emit(
+            "download-start",
+            DownloadStart {
+                number_of_files: newest_files.len() as u64,
+                file_ids: file_ids.map_err(|e| e.to_string())?,
+            },
+        )
+        .map_err(|e| e.to_string())?;
         for newest_file in newest_files {
             let path = cache_dir.join(newest_file.file.clone());
             if path.exists() {
@@ -469,6 +495,16 @@ pub async fn download_mod_command(
                 download_mod(&*newest_file.download_url, app.clone())
                     .await
                     .map_err(|e| e.to_string())?,
+            )
+            .map_err(|e| e.to_string())?;
+            app.emit(
+                "download-end",
+                DownloadEnd {
+                    id: newest_file
+                        .id_row
+                        .parse::<u64>()
+                        .map_err(|e| e.to_string())?,
+                },
             )
             .map_err(|e| e.to_string())?;
             paths.push(path.to_string_lossy().to_string());
