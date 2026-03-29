@@ -6,14 +6,70 @@ import {downloadDir} from "@tauri-apps/api/path";
 import processFiles from "../../utils/files.ts";
 import {useModsStore} from "../../stores/useModsStore.ts";
 import {useFileSelectStore} from "../../stores/useFileSelectStore.ts";
-import {useState} from "react";
-import {downloadModCommand} from "../../generated";
+import {useEffect, useRef, useState} from "react";
+import {downloadModCommand, onDownloadEnd, onDownloadProgress, onDownloadStart} from "../../generated";
+import {UnlistenFn} from "@tauri-apps/api/event";
 
 function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOpen: (open: boolean) => void }) {
     const {setVisible, setError} = useErrorStore();
     const {getModsFromRust, setMods} = useModsStore();
     const {setFilePaths} = useFileSelectStore();
     const [downloadUrl, setDownloadUrl] = useState("");
+
+
+    //download progress
+    const downloadProgressRegistered = useRef(false);
+    const [downloadProgress, setDownloadProgress] = useState<number>(0);
+    useEffect(() => {
+        if (downloadProgressRegistered.current) return;
+        downloadProgressRegistered.current = true;
+        let onDownloadProgressUnlisten: UnlistenFn;
+
+        onDownloadProgress((e) => {
+            setDownloadProgress(e.progressPercent)
+        }).then((fn) => {
+            onDownloadProgressUnlisten = fn
+        })
+        return () => {
+            if (onDownloadProgressUnlisten) onDownloadProgressUnlisten()
+        }
+    }, [])
+
+    //download start
+    const downloadStartRegistered = useRef(false);
+    const [isDownloading, setIsDownloading] = useState(true);
+    const [numberOfFiles, setNumberOfFiles] = useState(0);
+    useEffect(() => {
+        if (downloadStartRegistered.current) return;
+        downloadStartRegistered.current = true;
+        let onDownloadStartUnlisten: UnlistenFn;
+
+        onDownloadStart((e) => {
+            setIsDownloading(true);
+            setNumberOfFiles(e.numberOfFiles);
+        }).then((fn) => onDownloadStartUnlisten = fn)
+        return () => {
+            if (onDownloadStartUnlisten) onDownloadStartUnlisten()
+        }
+    }, []);
+
+    //download end
+    const downloadEndRegistered = useRef(false);
+    const [numberOfFilesCompleted, setNumberOfFilesCompleted] = useState(1);
+    useEffect(() => {
+        if (downloadEndRegistered.current) return;
+        downloadEndRegistered.current = true;
+        let onDownloadEndUnlisten: UnlistenFn;
+
+        onDownloadEnd((_) => {
+            setNumberOfFilesCompleted(numberOfFilesCompleted + 1)
+        })
+            .then(fn => onDownloadEndUnlisten = fn)
+
+        return () => {
+            if (onDownloadEndUnlisten) onDownloadEndUnlisten()
+        }
+    }, []);
 
     const onBrowseButtonClick = async () => {
         try {
@@ -60,7 +116,9 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
     }
 
     return (
-        <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <Modal open={modalOpen} onClose={() => {
+            if (!isDownloading) setModalOpen(false);
+        }}>
             <div
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/4 h-2/8 bg-darkBlue rounded-md min-w-160 min-h-100 flex flex-col">
                 <div className="mt-8 mx-8">
@@ -84,11 +142,20 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
                             </div>
                             <Button onClick={onDownloadButtonClick}>Download</Button>
                         </div>
-
+                        {isDownloading &&
+                            <>
+                                <div className="mt-8">Download progress of
+                                    file {`${numberOfFilesCompleted} / ${numberOfFiles}`}</div>
+                                <progress max={100} value={downloadProgress}
+                                          className={"w-full [&::-webkit-progress-value]:bg-spiritItem [&::-moz-progress-bar]:bg-spiritItem [&::-webkit-progress-bar]:bg-gray-800"}/>
+                            </>
+                        }
                     </div>
                 </div>
                 <div className="mb-4 mx-4 flex justify-between">
-                    <Button onClick={() => setModalOpen(false)}>Cancel</Button>
+                    <Button onClick={() => {
+                        if (!isDownloading) setModalOpen(false);
+                    }}>Cancel</Button>
                 </div>
             </div>
         </Modal>
