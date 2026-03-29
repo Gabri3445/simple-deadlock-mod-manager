@@ -28,4 +28,5 @@ pub enum Operation {
 pub enum CompressedFileType {
     Zip,
     Rar,
+    SevenZ,
 }

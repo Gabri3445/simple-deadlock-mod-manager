@@ -84,13 +84,14 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
                     },
                     {
                         name: "Compressed files",
-                        extensions: ["zip", "rar"]
+                        extensions: ["zip", "rar", "7z"]
                     }
                 ]
             })
 
             if (files) {
                 await processFiles({files, setFilePaths, setFileSelectModalOpen: setModalOpen});
+                setMods(await getModsFromRust());
             }
         } catch (error) {
             setVisible(true);

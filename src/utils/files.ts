@@ -24,26 +24,38 @@ export default async function processFiles({files, setFilePaths, setFileSelectMo
                     case "zip": {
                         const vpkFilePaths = await processCompressedFile({path: files[i], fType: "Zip"});
                         if (vpkFilePaths.length === 1) {
-                            await copyModToGame({path: vpkFilePaths[0], userName: getFileName(files[0])});
+                            await copyModToGame({path: vpkFilePaths[0], userName: getFileName(files[i])});
                         } else {
                             if (setFileSelectModalOpen && setFilePaths) {
                                 setFileSelectModalOpen(true);
                                 setFilePaths(vpkFilePaths);
                             }
                         }
-                        return;
+                        break;
                     }
                     case "rar": {
                         const vpkFilePaths = await processCompressedFile({path: files[i], fType: "Rar"});
                         if (vpkFilePaths.length === 1) {
-                            await copyModToGame({path: vpkFilePaths[0], userName: getFileName(files[0])},);
+                            await copyModToGame({path: vpkFilePaths[0], userName: getFileName(files[i])},);
                         } else {
                             if (setFileSelectModalOpen && setFilePaths) {
                                 setFileSelectModalOpen(true);
                                 setFilePaths(vpkFilePaths);
                             }
                         }
-                        return;
+                        break;
+                    }
+                    case "7z": {
+                        const vpkFilePaths = await processCompressedFile({path: files[i], fType: "SevenZ"});
+                        if (vpkFilePaths.length === 1) {
+                            await copyModToGame({path: vpkFilePaths[0], userName: getFileName(files[i])},);
+                        } else {
+                            if (setFileSelectModalOpen && setFilePaths) {
+                                setFileSelectModalOpen(true);
+                                setFilePaths(vpkFilePaths);
+                            }
+                        }
+                        break;
                     }
                     default:
                         throw `Unknown extension "${extensions[i]}"`

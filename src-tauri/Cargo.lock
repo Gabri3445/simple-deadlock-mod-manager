@@ -329,7 +329,7 @@ version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3078c7629b62d3f0439517fa394996acacc5cbc91c5a20d8c658e77abd503a71"
 dependencies = [
-    "generic-array",
+ "generic-array",
 ]
 
 [[package]]
@@ -503,7 +503,7 @@ version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "26b52a9543ae338f279b96b0b9fed9c8093744685043739079ce85cd58f289a6"
 dependencies = [
-    "cipher",
+ "cipher",
 ]
 
 [[package]]
@@ -2206,7 +2206,7 @@ version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "879f10e63c20629ecabbb64a8010319738c66a5cd0c29b02d63d272b03751d01"
 dependencies = [
-    "block-padding",
+ "block-padding",
  "generic-array",
 ]
 
@@ -4171,16 +4171,16 @@ version = "0.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "29225600349ef74beda5a9fffb36ac660a24613c0bde9315d0c49be1d51e9c24"
 dependencies = [
-    "aes",
-    "bzip2",
-    "cbc",
-    "crc32fast",
-    "getrandom 0.4.2",
-    "js-sys",
-    "lzma-rust2",
-    "ppmd-rust",
-    "sha2",
-    "wasm-bindgen",
+ "aes",
+ "bzip2",
+ "cbc",
+ "crc32fast",
+ "getrandom 0.4.2",
+ "js-sys",
+ "lzma-rust2",
+ "ppmd-rust",
+ "sha2",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -4238,7 +4238,7 @@ dependencies = [
  "reqwest 0.13.2",
  "serde",
  "serde_json",
-    "sevenz-rust2",
+ "sevenz-rust2",
  "steamlocate",
  "tauri",
  "tauri-build",

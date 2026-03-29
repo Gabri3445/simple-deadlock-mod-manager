@@ -435,6 +435,14 @@ pub fn process_compressed_file(
                 }
                 list_vpk_files(extract_path, &mut result).map_err(|e| e.to_string())?;
             }
+            CompressedFileType::SevenZ => {
+                let extract_path = cache_dir.join(f_path.file_prefix().unwrap());
+                if extract_path.exists() {
+                    std::fs::remove_dir_all(&extract_path).map_err(|e| e.to_string())?;
+                }
+                sevenz_rust2::decompress_file(&f_path, &extract_path).map_err(|e| e.to_string())?;
+                list_vpk_files(extract_path, &mut result).map_err(|e| e.to_string())?;
+            }
         };
     } else {
         return Err(format!("File {} does not exist", f_path.to_string_lossy()));
