@@ -396,34 +396,47 @@ pub fn delete_mod(file_name: String, state: State<ConfigState>) -> Result<(), St
 /// It will then extract every file to the cache folder
 /// And will return an array of paths to those files
 #[tauri::command]
-pub fn process_compressed_file(
+pub async fn process_compressed_file(
     path: String,
     f_type: CompressedFileType,
-    state: State<ConfigState>,
+    state: State<'_, ConfigState>,
 ) -> Result<Vec<String>, String> {
-    let mut result: Vec<String> = Vec::new();
-    let cache_dir = &state.cache_path;
-    let f_path = PathBuf::from(path);
-    if f_path.exists() {
+    let cache_dir = state.cache_path.clone();
+
+    tauri::async_runtime::spawn_blocking(move || {
+        let mut result: Vec<String> = Vec::new();
+        let f_path = PathBuf::from(path);
+
+        if !f_path.exists() {
+            return Err(format!("File {} does not exist", f_path.to_string_lossy()));
+        }
+
         match f_type {
             CompressedFileType::Zip => {
                 let zip_file = std::fs::File::open(&f_path).map_err(|e| e.to_string())?;
                 let mut archive = zip::ZipArchive::new(zip_file).map_err(|e| e.to_string())?;
+
                 let extract_path = cache_dir.join(f_path.file_prefix().unwrap());
+
                 if extract_path.exists() {
                     std::fs::remove_dir_all(&extract_path).map_err(|e| e.to_string())?;
                 }
+
                 archive.extract(&extract_path).map_err(|e| e.to_string())?;
                 list_vpk_files(extract_path, &mut result).map_err(|e| e.to_string())?;
             }
+
             CompressedFileType::Rar => {
                 let extract_path = cache_dir.join(f_path.file_prefix().unwrap());
+
                 let mut archive = Archive::new(&f_path)
                     .open_for_processing()
                     .map_err(|e| e.to_string())?;
+
                 if extract_path.exists() {
                     std::fs::remove_dir_all(&extract_path).map_err(|e| e.to_string())?;
                 }
+
                 while let Some(header) = archive.read_header().map_err(|e| e.to_string())? {
                     archive = if header.entry().is_file() {
                         header
@@ -433,21 +446,27 @@ pub fn process_compressed_file(
                         header.skip().map_err(|e| e.to_string())?
                     };
                 }
+
                 list_vpk_files(extract_path, &mut result).map_err(|e| e.to_string())?;
             }
+
             CompressedFileType::SevenZ => {
                 let extract_path = cache_dir.join(f_path.file_prefix().unwrap());
+
                 if extract_path.exists() {
                     std::fs::remove_dir_all(&extract_path).map_err(|e| e.to_string())?;
                 }
+
                 sevenz_rust2::decompress_file(&f_path, &extract_path).map_err(|e| e.to_string())?;
+
                 list_vpk_files(extract_path, &mut result).map_err(|e| e.to_string())?;
             }
         };
-    } else {
-        return Err(format!("File {} does not exist", f_path.to_string_lossy()));
-    }
-    Ok(result)
+
+        Ok(result)
+    })
+    .await
+    .unwrap()
 }
 
 #[derive(Clone, Serialize)]
