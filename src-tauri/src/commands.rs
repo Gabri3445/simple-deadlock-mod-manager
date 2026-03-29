@@ -397,7 +397,7 @@ pub fn process_compressed_file(
             CompressedFileType::Zip => {
                 let zip_file = std::fs::File::open(&f_path).map_err(|e| e.to_string())?;
                 let mut archive = zip::ZipArchive::new(zip_file).map_err(|e| e.to_string())?;
-                let extract_path = cache_dir.join(f_path.file_name().unwrap());
+                let extract_path = cache_dir.join(f_path.file_prefix().unwrap());
                 if extract_path.exists() {
                     std::fs::remove_dir_all(&extract_path).map_err(|e| e.to_string())?;
                 }
@@ -405,7 +405,7 @@ pub fn process_compressed_file(
                 list_vpk_files(extract_path, &mut result).map_err(|e| e.to_string())?;
             }
             CompressedFileType::Rar => {
-                let extract_path = cache_dir.join(f_path.file_name().unwrap());
+                let extract_path = cache_dir.join(f_path.file_prefix().unwrap());
                 let mut archive = Archive::new(&f_path)
                     .open_for_processing()
                     .map_err(|e| e.to_string())?;
