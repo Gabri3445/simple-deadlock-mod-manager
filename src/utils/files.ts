@@ -46,7 +46,7 @@ export default async function processFiles({files, setFilePaths, setFileSelectMo
                         return;
                     }
                     default:
-                        throw new Error(`Unknown extension "${extensions[i]}"`);
+                        throw `Unknown extension "${extensions[i]}"`
                 }
             }
         }
