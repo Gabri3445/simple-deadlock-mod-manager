@@ -14,6 +14,7 @@ mod utils;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_http::init())
         .setup(|app| {
             if let Some(proj_dirs) = ProjectDirs::from("", "sdmm", "sdmm") {
                 let config_dir = proj_dirs.config_dir().join("config.json");
