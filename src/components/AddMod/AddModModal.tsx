@@ -91,7 +91,6 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
 
             if (files) {
                 await processFiles({files, setFilePaths, setFileSelectModalOpen: setModalOpen});
-                setMods(await getModsFromRust());
             }
         } catch (error) {
             setVisible(true);
@@ -105,7 +104,8 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
         try {
             if (downloadUrl !== "") {
                 let paths = await downloadModCommand({url: downloadUrl});
-                console.log(paths);
+                await processFiles({files: paths, setFilePaths, setFileSelectModalOpen: setModalOpen});
+                setMods(await getModsFromRust());
             }
         } catch (error) {
             setVisible(true);

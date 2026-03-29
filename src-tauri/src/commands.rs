@@ -316,41 +316,53 @@ pub fn apply_changes(
 /// It will load the mod in a unloaded state
 /// It does so by adding a random prefix at the start of the name (same as apply_changes)
 #[tauri::command]
-pub fn copy_mod_to_game(path: String, state: State<ConfigState>) -> Result<ModName, String> {
-    let config = state.config.lock().map_err(|e| e.to_string())?;
-    if !is_deadlock_path_valid(&config.deadlock_path) {
-        return Err("Deadlock path is not valid".to_string());
-    }
-    let fpath = PathBuf::from(&path);
-    if !fpath.exists() {
-        return Err(format!("File {} does not exist", path));
-    }
-    if let Some(extension) = fpath.extension() {
-        if extension != "vpk" {
-            return Err("Mod file must be a vpk".to_string());
+pub fn copy_mod_to_game(
+    path: String,
+    user_name: Option<String>,
+    state: State<ConfigState>,
+) -> Result<ModName, String> {
+    {
+        let mut config = state.config.lock().map_err(|e| e.to_string())?;
+        if !is_deadlock_path_valid(&config.deadlock_path) {
+            return Err("Deadlock path is not valid".to_string());
+        }
+        let fpath = PathBuf::from(&path);
+        if !fpath.exists() {
+            return Err(format!("File {} does not exist", path));
+        }
+        if let Some(extension) = fpath.extension() {
+            if extension != "vpk" {
+                return Err("Mod file must be a vpk".to_string());
+            }
+        }
+        let addons_path = PathBuf::from(config.deadlock_path.clone())
+            .join("game")
+            .join("citadel")
+            .join("addons");
+        std::fs::create_dir_all(&addons_path).map_err(|e| e.to_string())?;
+        let mut fname = fpath.file_name().unwrap().to_string_lossy().into_owned();
+        let regex = Regex::new(VALID_MOD_REGEX).unwrap();
+        if regex.is_match(fname.as_ref()) {
+            let mut rng = rand::rng();
+            let random_prefix = rng.random_range(0..9999);
+            fname = format!("{}_{}", random_prefix, fname)
+        }
+        let mut mod_path = addons_path.join(&fname);
+
+        if mod_path.exists() {
+            let mut rng = rand::rng();
+            let random_prefix = rng.random_range(0..9999);
+            fname = format!("{}_{}", random_prefix, fname);
+            mod_path = addons_path.join(&fname);
+        }
+        std::fs::copy(fpath, mod_path).map_err(|e| e.to_string())?;
+        if user_name.is_some() {
+            config
+                .mod_names
+                .insert(fname.clone(), user_name.unwrap().to_string());
         }
     }
-    let addons_path = PathBuf::from(config.deadlock_path.clone())
-        .join("game")
-        .join("citadel")
-        .join("addons");
-    std::fs::create_dir_all(&addons_path).map_err(|e| e.to_string())?;
-    let mut fname = fpath.file_name().unwrap().to_string_lossy().into_owned();
-    let regex = Regex::new(VALID_MOD_REGEX).unwrap();
-    if regex.is_match(fname.as_ref()) {
-        let mut rng = rand::rng();
-        let random_prefix = rng.random_range(0..9999);
-        fname = format!("{}_{}", random_prefix, fname)
-    }
-    let mut mod_path = addons_path.join(&fname);
-
-    if mod_path.exists() {
-        let mut rng = rand::rng();
-        let random_prefix = rng.random_range(0..9999);
-        fname = format!("{}_{}", random_prefix, fname);
-        mod_path = addons_path.join(&fname);
-    }
-    std::fs::copy(fpath, mod_path).map_err(|e| e.to_string())?;
+    save_config(&state).map_err(|e| e.to_string())?;
     Ok(ModName {
         user_name: "".to_string(),
         file_name: "".to_string(),

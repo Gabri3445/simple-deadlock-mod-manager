@@ -22,25 +22,25 @@ export default async function processFiles({files, setFilePaths, setFileSelectMo
             } else {
                 switch (extensions[i]) {
                     case "zip": {
-                        const filePaths = await processCompressedFile({path: files[i], fType: "Zip"});
-                        if (filePaths.length === 1) {
-                            await copyModToGame({path: filePaths[1]});
+                        const vpkFilePaths = await processCompressedFile({path: files[i], fType: "Zip"});
+                        if (vpkFilePaths.length === 1) {
+                            await copyModToGame({path: vpkFilePaths[0], userName: getFileName(files[0])});
                         } else {
                             if (setFileSelectModalOpen && setFilePaths) {
                                 setFileSelectModalOpen(true);
-                                setFilePaths(filePaths);
+                                setFilePaths(vpkFilePaths);
                             }
                         }
                         return;
                     }
                     case "rar": {
-                        const filePaths = await processCompressedFile({path: files[i], fType: "Rar"});
-                        if (filePaths.length === 1) {
-                            await copyModToGame({path: filePaths[1]});
+                        const vpkFilePaths = await processCompressedFile({path: files[i], fType: "Rar"});
+                        if (vpkFilePaths.length === 1) {
+                            await copyModToGame({path: vpkFilePaths[0], userName: getFileName(files[0])},);
                         } else {
                             if (setFileSelectModalOpen && setFilePaths) {
                                 setFileSelectModalOpen(true);
-                                setFilePaths(filePaths);
+                                setFilePaths(vpkFilePaths);
                             }
                         }
                         return;
@@ -51,4 +51,8 @@ export default async function processFiles({files, setFilePaths, setFileSelectMo
             }
         }
     }
+}
+
+export function getFileName(filePath: string) {
+    return (filePath.split(/[/\\]/).pop() || '').replace(/\.[^/.]+$/, '');
 }
