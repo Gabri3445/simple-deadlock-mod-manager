@@ -2,7 +2,7 @@
 
 [![AUR](https://img.shields.io/aur/version/simple-deadlock-mod-manager?logo=archlinux)](https://aur.archlinux.org/packages/simple-deadlock-mod-manager/)
 [![AUR-GIT](https://img.shields.io/aur/version/simple-deadlock-mod-manager-git?logo=archlinux)](https://aur.archlinux.org/packages/simple-deadlock-mod-manager-git/)
-[![Gamebanana](https://img.shields.io/badge/Gamebanana-0.3.0-yellow?logo=gamebanana)](https://gamebanana.com/tools/22154)
+[![Gamebanana](https://img.shields.io/badge/Gamebanana-0.4.1-yellow?logo=gamebanana)](https://gamebanana.com/tools/22154)
 
 ![Trans Ware](https://pride-badges.pony.workers.dev/static/v1?label=Trans%20Ware&stripeWidth=6&stripeColors=5BCEFA,F5A9B8,FFFFFF,F5A9B8,5BCEFA)
 
@@ -49,7 +49,7 @@ Go to the [Releases Page](https://github.com/Gabri3445/simple-deadlock-mod-manag
 - [x] Deleting mods
 - [x] Drag and drop
 - [x] Load `.vpk` files directly from `.zip` or `.rar` archives
-- [ ] Download mods directly from **GameBanana**
+- [x] Download mods directly from **GameBanana**
 - [ ] Check for mod updates
 
 
