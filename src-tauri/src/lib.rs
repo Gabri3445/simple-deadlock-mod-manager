@@ -27,6 +27,7 @@ pub fn run() {
         )
         .plugin(tauri_plugin_http::init())
         .setup(|app| {
+            log::info!("Starting app");
             if let Some(proj_dirs) = ProjectDirs::from("", "sdmm", "sdmm") {
                 let config_dir = proj_dirs.config_dir().join("config.json");
                 let cache_dir = proj_dirs.cache_dir();
