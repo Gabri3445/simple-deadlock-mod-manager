@@ -55,14 +55,25 @@ pub(crate) const VALID_MOD_REGEX: &str = r"^pak\d\d_dir\.vpk";
 /// Get the path to the Deadlock game installation directory
 #[tauri::command]
 pub fn get_auto_detect_deadlock_path() -> Result<String, String> {
-    let steam_dir = steamlocate::SteamDir::locate().map_err(|e| e.to_string())?;
+    let steam_dir = steamlocate::SteamDir::locate().map_err(|_| {
+        log::warn!("Could not locate steam directory");
+        "Could not locate steam directory".to_string()
+    })?;
+    log::info!("{}", format!("Found steam directory at {:?}", steam_dir));
     match steam_dir.find_app(DEADLOCK_APP_ID) {
         Ok(Some((deadlock, library))) => {
             let app_dir = library.resolve_app_dir(&deadlock);
+            log::info!("Found deadlock directory at {:?}", app_dir);
             Ok(app_dir.to_string_lossy().into_owned())
         }
-        Ok(None) => Err("Deadlock not found".to_string()),
-        Err(e) => Err(format!("Failed to find Steam app: {}", e)),
+        Ok(None) => {
+            log::warn!("Deadlock not found");
+            Err("Deadlock not found".to_string())
+        }
+        Err(e) => {
+            log::error!("Failed to find Deadlock");
+            Err(format!("Failed to find Steam app: {}", e))
+        }
     }
 }
 
