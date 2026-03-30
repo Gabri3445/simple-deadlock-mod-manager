@@ -50,7 +50,9 @@ pub fn load_config() -> Result<ModManagerConfig, Box<dyn std::error::Error>> {
         std::fs::create_dir_all(proj_dirs.config_dir().to_path_buf())
             .map_err(|_| "Could not create config dir")?;
         cache_path = proj_dirs.cache_dir().to_path_buf();
-        std::fs::remove_dir_all(&cache_path).map_err(|_| "Could not remove cache dir")?;
+        if cache_path.exists() {
+            std::fs::remove_dir_all(&cache_path).map_err(|_| "Could not remove cache dir")?;
+        }
         std::fs::create_dir_all(&cache_path).map_err(|_| "Could not create cache dir")?;
     }
     if !config_path.exists() {
