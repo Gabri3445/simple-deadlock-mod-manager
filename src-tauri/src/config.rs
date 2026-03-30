@@ -47,10 +47,11 @@ pub fn load_config() -> Result<ModManagerConfig, Box<dyn std::error::Error>> {
     let mut cache_path = PathBuf::new();
     if let Some(proj_dirs) = ProjectDirs::from("", "sdmm", "sdmm") {
         config_path = proj_dirs.config_dir().to_path_buf().join("config.json");
-        std::fs::create_dir_all(proj_dirs.config_dir().to_path_buf())?;
+        std::fs::create_dir_all(proj_dirs.config_dir().to_path_buf())
+            .map_err(|_| "Could not create config dir")?;
         cache_path = proj_dirs.cache_dir().to_path_buf();
-        std::fs::remove_dir_all(&cache_path)?;
-        std::fs::create_dir_all(&cache_path)?;
+        std::fs::remove_dir_all(&cache_path).map_err(|_| "Could not remove cache dir")?;
+        std::fs::create_dir_all(&cache_path).map_err(|_| "Could not create cache dir")?;
     }
     if !config_path.exists() {
         let default_config = ModManagerConfig::default();
@@ -61,7 +62,9 @@ pub fn load_config() -> Result<ModManagerConfig, Box<dyn std::error::Error>> {
         })?;
         return Ok(default_config);
     }
-    let contents = std::fs::read_to_string(&config_path)?;
-    let config = serde_json::from_str::<ModManagerConfig>(&contents)?;
+    let contents =
+        std::fs::read_to_string(&config_path).map_err(|_| "Could not read config file")?;
+    let config = serde_json::from_str::<ModManagerConfig>(&contents)
+        .map_err(|_| "Could not parse config file")?;
     Ok(config)
 }
