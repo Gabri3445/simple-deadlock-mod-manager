@@ -26,7 +26,12 @@ pub fn is_deadlock_path_valid(deadlock_path: &String) -> bool {
         .join("game")
         .join("citadel")
         .join("gameinfo.gi");
-    gameinfo_path.exists()
+    if !gameinfo_path.exists() {
+        log::warn!("Deadlock path is not valid at {}", gameinfo_path.display());
+        false
+    } else {
+        true
+    }
 }
 
 /// Returns a list of Mods (see types.rs)
