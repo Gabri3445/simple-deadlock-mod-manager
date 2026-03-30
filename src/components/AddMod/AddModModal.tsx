@@ -14,7 +14,7 @@ import {useLoadingStore} from "../../stores/useLoadingStore.ts";
 function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOpen: (open: boolean) => void }) {
     const {setVisible, setError} = useErrorStore();
     const {getModsFromRust, setMods} = useModsStore();
-    const {setFilePaths} = useFileSelectStore();
+    const fileSelectStore = useFileSelectStore();
     const [downloadUrl, setDownloadUrl] = useState("");
     const {setIsLoading} = useLoadingStore();
 
@@ -93,7 +93,11 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
 
             if (files) {
                 setIsLoading(true);
-                await processFiles({files, setFilePaths, setFileSelectModalOpen: setModalOpen});
+                await processFiles({
+                    files,
+                    setFilePaths: fileSelectStore.setFilePaths,
+                    setFileSelectModalOpen: fileSelectStore.setModalOpen
+                });
                 setMods(await getModsFromRust());
                 setIsLoading(false);
             }
@@ -110,7 +114,11 @@ function AddModModal({modalOpen, setModalOpen}: { modalOpen: boolean, setModalOp
             if (downloadUrl !== "") {
                 let paths = await downloadModCommand({url: downloadUrl});
                 setIsLoading(true);
-                await processFiles({files: paths, setFilePaths, setFileSelectModalOpen: setModalOpen});
+                await processFiles({
+                    files: paths,
+                    setFilePaths: fileSelectStore.setFilePaths,
+                    setFileSelectModalOpen: setModalOpen
+                });
                 setMods(await getModsFromRust());
                 setIsLoading(false);
             }
