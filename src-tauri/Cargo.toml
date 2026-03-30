@@ -36,4 +36,6 @@ url = "2.5.8"
 tauri-plugin-http = "2"
 futures-util = "0.3.32"
 sevenz-rust2 = "0.20.2"
+tauri-plugin-log = "2"
+log = "0.4.29"
 
