@@ -292,6 +292,12 @@ pub fn apply_changes(
                                 }
                                 pak_number += 1;
                             }
+                            log::info!(
+                                "Loading mod {}:{} with new file name {}",
+                                &mod_to_load.file_name,
+                                &mod_to_load.user_name,
+                                format!("pak{:02}_dir.vpk", pak_number)
+                            );
                         }
                     }
                 }
@@ -311,6 +317,16 @@ pub fn apply_changes(
                                 entry.file_name().to_string_lossy()
                             );
                             let new_path = mod_path.join(&new_name);
+                            log::info!(
+                                "Unloading mod {}:{} with new file name {}",
+                                &mod_to_unload.file_name,
+                                &mod_to_unload.user_name,
+                                format!(
+                                    "{}_{}",
+                                    random_prefix,
+                                    entry.file_name().to_string_lossy()
+                                )
+                            );
                             std::fs::rename(entry.path(), new_path).map_err(|e| e.to_string())?;
                             update_config_mod_name(&mut config, &mod_to_unload, new_name);
                         }
@@ -367,7 +383,8 @@ pub fn copy_mod_to_game(
             fname = format!("{}_{}", random_prefix, fname);
             mod_path = addons_path.join(&fname);
         }
-        std::fs::copy(fpath, mod_path).map_err(|e| e.to_string())?;
+        std::fs::copy(fpath, &mod_path).map_err(|e| e.to_string())?;
+        log::info!("Copying mod {} to {}", &path, mod_path.display());
         if user_name.is_some() {
             config
                 .mod_names
@@ -401,6 +418,7 @@ pub fn delete_mod(file_name: String, state: State<ConfigState>) -> Result<(), St
     }
 
     std::fs::remove_file(mod_path).map_err(|e| e.to_string())?;
+    log::info!("Deleted mod {}", &file_name);
     Ok(())
 }
 
@@ -435,6 +453,11 @@ pub async fn process_compressed_file(
                 }
 
                 archive.extract(&extract_path).map_err(|e| e.to_string())?;
+                log::info!(
+                    "Compressed Zip file {} extracted to {}",
+                    f_path.to_string_lossy(),
+                    extract_path.to_string_lossy()
+                );
                 list_vpk_files(extract_path, &mut result).map_err(|e| e.to_string())?;
             }
 
@@ -458,6 +481,11 @@ pub async fn process_compressed_file(
                         header.skip().map_err(|e| e.to_string())?
                     };
                 }
+                log::info!(
+                    "Compressed Rar file {} extracted to {}",
+                    f_path.to_string_lossy(),
+                    extract_path.to_string_lossy()
+                );
 
                 list_vpk_files(extract_path, &mut result).map_err(|e| e.to_string())?;
             }
@@ -471,10 +499,19 @@ pub async fn process_compressed_file(
 
                 sevenz_rust2::decompress_file(&f_path, &extract_path).map_err(|e| e.to_string())?;
 
+                log::info!(
+                    "Compressed 7z file {} extracted to {}",
+                    f_path.to_string_lossy(),
+                    extract_path.to_string_lossy()
+                );
+
                 list_vpk_files(extract_path, &mut result).map_err(|e| e.to_string())?;
             }
         };
-
+        log::info!(
+            "Extracted files : {:?}",
+            serde_json::to_string_pretty(&result).map_err(|e| e.to_string())?
+        );
         Ok(result)
     })
     .await
@@ -500,6 +537,7 @@ pub async fn download_mod_command(
     state: State<'_, ConfigState>,
     app: AppHandle,
 ) -> Result<Vec<String>, String> {
+    log::info!("Downloading mod {}", url);
     let cache_dir = &state.cache_path;
     if let Some(id) = Url::parse(&url)
         .map_err(|e| e.to_string())?
@@ -560,6 +598,10 @@ pub async fn download_mod_command(
             .map_err(|e| e.to_string())?;
             paths.push(path.to_string_lossy().to_string());
         }
+        log::info!(
+            "Download mod with files at {}",
+            serde_json::to_string_pretty(&paths).map_err(|e| e.to_string())?
+        );
         Ok(paths)
     } else {
         Err(format!("Invalid URL: {}", url))
