@@ -1,17 +1,31 @@
 import {Modal} from "@mui/material";
 import {useModManageStore} from "../../../stores/useModManageStore.ts";
 import Button from "../../Button/Button.tsx";
+import {changeModName} from "../../../generated";
+import {useState} from "react";
+import {useErrorStore} from "../../../stores/useErrorStore.ts";
+import {useModsStore} from "../../../stores/useModsStore.ts";
 
 function ManageModModal() {
 
     const {modManageModalOpen, fileName, userName, setModManageModalOpen} = useModManageStore();
+    const {setMods, getModsFromRust} = useModsStore();
+
+    const [changedUserName, setChangedUserName] = useState<string>("");
+    const {setVisible, setError} = useErrorStore();
 
     const onCloseModal = () => {
         setModManageModalOpen(false);
     }
 
-    const onApply = () => {
+    const onApply = async () => {
         setModManageModalOpen(false);
+        if (changedUserName === "") {
+            throw "User name cannot be blank";
+        }
+        await changeModName({userName: changedUserName, fileName});
+        setMods(await getModsFromRust());
+        onCloseModal();
     }
 
     return (
@@ -28,7 +42,23 @@ function ManageModModal() {
                     </div>
                     <div className="flex gap-2 mt-8">
                         <label>User Name</label>
-                        <div className="bg-gray-800 grow">{userName}</div>
+                        <div className="bg-gray-800 grow">
+                            <input id="pathInput" defaultValue={userName}
+                                   onChange={(e) => {
+                                       setChangedUserName(e.target.value)
+                                   }}
+                                   onKeyDown={async (e) => {
+                                       if (e.key === "Enter") {
+                                           try {
+                                               await onApply();
+                                           } catch (e) {
+                                               setVisible(true);
+                                               setError(e as string);
+                                           }
+                                       }
+                                   }}
+                                   className="text-lg m-1 w-full mr-1"/>
+                        </div>
                     </div>
                     <div className="flex gap-2 mt-8">
                         <label>GameBanana Link</label>

@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Textfit} from 'react-textfit';
 import {Tooltip} from "@mui/material";
 import {useModsStore} from "../../stores/useModsStore.ts";
@@ -16,6 +16,10 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
 
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(modName);
+
+    useEffect(() => {
+        setValue(modName);
+    }, [modName]);
 
     const [color] = useState(colors[Math.floor(Math.random() * colors.length)]);
 
