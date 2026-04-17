@@ -5,11 +5,13 @@ import {changeModName} from "../../../generated";
 import {useState} from "react";
 import {useErrorStore} from "../../../stores/useErrorStore.ts";
 import {useModsStore} from "../../../stores/useModsStore.ts";
+import {useDeleteStore} from "../../../stores/useDeleteStore.ts";
 
 function ManageModModal() {
 
     const {modManageModalOpen, fileName, userName, setModManageModalOpen} = useModManageStore();
     const {setMods, getModsFromRust} = useModsStore();
+    const deleteStore = useDeleteStore();
 
     const [changedUserName, setChangedUserName] = useState<string>("");
     const {setVisible, setError} = useErrorStore();
@@ -28,10 +30,17 @@ function ManageModModal() {
         onCloseModal();
     }
 
+    const onDeleteButtonClick = () => {
+        deleteStore.setFileName(fileName);
+        deleteStore.setUserName(userName);
+        deleteStore.setModalOpen(true);
+        onCloseModal();
+    }
+
     return (
         <Modal open={modManageModalOpen} onClose={onCloseModal}>
             <div
-                className="absolute top-1/2 left-1/2 -translate-1/2 w-2/4 h-2/3 bg-darkBlue rounded-md min-w-160 min-h-30 flex flex-col">
+                className="absolute top-1/2 left-1/2 -translate-1/2 w-2/4 h-2/6 bg-darkBlue rounded-md min-w-160 min-h-100 flex flex-col">
                 <div className="mt-8 ml-8 text-3xl font-extrabold">
                     Manage Mod
                 </div>
@@ -65,7 +74,7 @@ function ManageModModal() {
                         <div className="bg-gray-800 grow">WIP</div>
                     </div>
                     <div className="flex gap-2 mt-8">
-                        <Button>Delete Mod</Button>
+                        <Button onClick={onDeleteButtonClick}>Delete Mod</Button>
                     </div>
                 </div>
                 <div className="flex w-full justify-between px-8 mb-8 text-xl">
