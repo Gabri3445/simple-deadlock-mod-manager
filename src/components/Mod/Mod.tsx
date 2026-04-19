@@ -86,12 +86,6 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
                     className="w-6 h-6 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"
                     type={"checkbox"}
                     onChange={(e) => {
-                        /*
-                        todo: replace this with an options menu for the mod
-                        it should have a input for renaming it,
-                        a button for deleting it
-                        and an input to link it to a gamebanana mod, to check for updates
-                        */
                         if (selectedMods.filter((f) => (f.variant !== variant)).length > 0) {
                             e.target.checked = !e.target.checked;
                             return;
