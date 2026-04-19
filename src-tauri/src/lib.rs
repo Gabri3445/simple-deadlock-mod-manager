@@ -21,7 +21,7 @@ pub fn run() {
                         file_name: Some("logs".to_string()),
                     },
                 ))
-                .max_file_size(1000)
+                .max_file_size(10000)
                 .rotation_strategy(tauri_plugin_log::RotationStrategy::KeepAll)
                 .build(),
         )
