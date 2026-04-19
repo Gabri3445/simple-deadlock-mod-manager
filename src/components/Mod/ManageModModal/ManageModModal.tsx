@@ -69,10 +69,10 @@ function ManageModModal() {
                                    className="text-lg m-1 w-full mr-1"/>
                         </div>
                     </div>
-                    <div className="flex gap-2 mt-8">
+                    {/*<div className="flex gap-2 mt-8">
                         <label>GameBanana Link</label>
                         <div className="bg-gray-800 grow">WIP</div>
-                    </div>
+                    </div>*/}
                     <div className="flex gap-2 mt-8">
                         <Button onClick={onDeleteButtonClick}>Delete Mod</Button>
                     </div>
