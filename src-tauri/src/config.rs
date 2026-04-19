@@ -57,7 +57,10 @@ pub fn load_config() -> Result<ModManagerConfig, Box<dyn std::error::Error>> {
     if let Some(proj_dirs) = ProjectDirs::from("", "sdmm", "sdmm") {
         config_path = proj_dirs.config_dir().to_path_buf().join("config.json");
         std::fs::create_dir_all(proj_dirs.config_dir().to_path_buf()).map_err(|_| {
-            log::error!("Could not create config dir");
+            log::error!(
+                "Could not create config dir {}",
+                proj_dirs.config_dir().to_path_buf().display()
+            );
             "Could not create config dir"
         })?;
         log::info!(
