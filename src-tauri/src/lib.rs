@@ -10,8 +10,8 @@ mod config;
 mod gamebanana_api;
 mod types;
 mod utils;
-
 //function from https://github.com/TwintailTeam/TwintailLauncher/blob/stable/src-tauri/src/utils/gpu.rs
+#[cfg(target_os = "linux")]
 fn nvidia_bug_fix() {
     use wgpu::{
         BackendOptions, Backends, DeviceType, GlBackendOptions, Instance, InstanceDescriptor,
