@@ -280,7 +280,7 @@ pub fn apply_changes(
                     for entry in &mods_dir_entries {
                         if mod_to_load.file_name == entry.file_name().to_string_lossy().to_string()
                         {
-                            let mut pak_number = 1;
+                            let mut pak_number = 0;
                             loop {
                                 let new_name = format!("pak{:02}_dir.vpk", pak_number);
                                 let new_path = mod_path.join(&new_name);
@@ -289,6 +289,12 @@ pub fn apply_changes(
                                         .map_err(|e| e.to_string())?;
                                     update_config_mod_name(&mut config, &mod_to_load, new_name);
                                     break;
+                                }
+                                if pak_number > 99 {
+                                    log::error!("Unable to load more than 100 mods");
+                                    return Err("Unable to load more than 100 mods"
+                                        .parse()
+                                        .unwrap());
                                 }
                                 pak_number += 1;
                             }
