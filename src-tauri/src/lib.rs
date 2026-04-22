@@ -11,8 +11,48 @@ mod gamebanana_api;
 mod types;
 mod utils;
 
+//function from https://github.com/TwintailTeam/TwintailLauncher/blob/stable/src-tauri/src/utils/gpu.rs
+fn nvidia_bug_fix() {
+    use wgpu::{
+        BackendOptions, Backends, DeviceType, GlBackendOptions, Instance, InstanceDescriptor,
+        InstanceFlags,
+    };
+
+    let instance = Instance::new(&InstanceDescriptor {
+        flags: InstanceFlags::empty(),
+        backends: Backends::GL | Backends::VULKAN,
+        memory_budget_thresholds: Default::default(),
+        backend_options: BackendOptions {
+            gl: GlBackendOptions::default(),
+            dx12: Default::default(),
+            noop: Default::default(),
+        },
+    });
+
+    for adapter in instance.enumerate_adapters(Backends::all()) {
+        let info = adapter.get_info();
+
+        match info.device_type {
+            DeviceType::DiscreteGpu | DeviceType::IntegratedGpu | DeviceType::VirtualGpu => unsafe {
+                if info.name.to_ascii_lowercase().contains("nvidia") {
+                    std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+                    std::env::set_var("__GL_THREADED_OPTIMIZATIONS", "0");
+                    std::env::set_var("__NV_DISABLE_EXPLICIT_SYNC", "1");
+                    std::env::set_var("WEBKIT_DISABLE_COMPOSITING_MODE", "1");
+                    log::info!("NVIDIA GPU detected, disabling DMABUF rendering!")
+                }
+            },
+            _ => {}
+        }
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    #[cfg(target_os = "linux")]
+    {
+        nvidia_bug_fix();
+    }
     tauri::Builder::default()
         .plugin(
             tauri_plugin_log::Builder::new()

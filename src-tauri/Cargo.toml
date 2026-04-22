@@ -39,3 +39,5 @@ sevenz-rust2 = "0.20.2"
 tauri-plugin-log = "2"
 log = "0.4.29"
 
+[target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
+wgpu = { version = "27.0.1", default-features = false, features = ["vulkan"] }
