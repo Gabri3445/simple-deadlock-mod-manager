@@ -21,7 +21,7 @@ function LoadModButtons() {
         changeModLoadStatus(selectedMods);
     }
     return (
-        <div className="h-full flex justify-center items-center bottom-0">
+        <div className="h-screen flex justify-center items-center bottom-0">
             <div className="flex flex-col gap-2 fixed">
                 <Button onClick={() => onClick(ButtonType.LEFT)}>&lt;&lt;</Button>
                 <Button onClick={() => onClick(ButtonType.RIGHT)}>&gt;&gt;</Button>
