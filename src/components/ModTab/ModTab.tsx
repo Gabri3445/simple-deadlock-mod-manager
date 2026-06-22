@@ -17,7 +17,6 @@ function ModTab({variant, mods, loading}: { variant: ModTabVariant, mods: ModNam
         let list: string[] = [];
         switch (searchType) {
             case SearchType.FileName:
-                threshold = 0
                 list = mods.map((m) => m.file_name)
                 break;
             case SearchType.UserName:
