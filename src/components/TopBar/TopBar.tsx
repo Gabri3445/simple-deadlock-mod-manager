@@ -4,6 +4,7 @@ import {useState} from "react";
 import {useModsStore} from "../../stores/useModsStore.ts";
 import {useErrorStore} from "../../stores/useErrorStore.ts";
 import AddModModal from "../AddMod/AddModModal.tsx";
+import Search from "../Search/Search.tsx";
 
 
 function TopBar() {
@@ -26,6 +27,7 @@ function TopBar() {
             <div className="flex gap-4">
                 <Button onClick={onModAddClick}>Add Mod</Button>
                 <AddModModal modalOpen={addModModalOpen} setModalOpen={setAddModModalOpen}/>
+                <Search/>
                 <Button onClick={handleOpenModal}>Options</Button>
                 <Options isOpen={openModal} onClose={handleCloseModal}/>
                 <Button onClick={async () => {

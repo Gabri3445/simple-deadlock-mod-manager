@@ -1,9 +1,9 @@
-import React from "react";
+import React, {Ref} from "react";
 
-function Button({children, onClick}: { onClick?: () => void, children?: React.ReactNode }) {
+function Button({children, onClick, ref}: { onClick?: () => void, children?: React.ReactNode, ref?: Ref<any> }) {
     return (
-        <button
-            className="bg-white/80 hover:bg-white active:bg-gray-500 transition-colors duration-200 text-black p-1 px-2 rounded-3xl font-retail-demo font-bold "
+        <button ref={ref}
+                className="bg-white/80 hover:bg-white active:bg-gray-500 transition-colors duration-200 text-black p-1 px-2 rounded-3xl font-retail-demo font-bold "
                 onClick={onClick}>{children}</button>
     )
 }
