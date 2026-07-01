@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Textfit} from 'react-textfit';
 import {Tooltip} from "@mui/material";
 import {useModsStore} from "../../stores/useModsStore.ts";
@@ -13,6 +13,8 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
     const {changeModName, addSelectedMod, removeSelectedMod, selectedMods} = useModsStore();
     //const {setFileName, setUserName, setModalOpen} = useDeleteStore();
     const {setUserName, setFileName, setModManageModalOpen} = useModManageStore();
+    const checkboxRef = useRef<HTMLInputElement>(null);
+    const [selected, setSelected] = useState(false)
 
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(modName);
@@ -29,9 +31,33 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
         setModManageModalOpen(true);
     }
 
+
+    const onSelect = (checkbox: HTMLInputElement) => {
+        if (selectedMods.filter((f) => (f.variant !== variant)).length > 0) {
+            checkbox.checked = !checkbox.checked;
+            return;
+        }
+        checkbox.checked = !checkbox.checked;
+        switch (selected) {
+            case true:
+                removeSelectedMod({variant, fileName, userName: modName})
+                setSelected(false)
+                break;
+            case false:
+                addSelectedMod({variant, fileName, userName: modName})
+                setSelected(true)
+                break;
+        }
+    }
+
     return (
         <div
-            className={`${color} h-30 relative flex flex-col items-center justify-center text-black font-bold rounded-lg border-2 border-white shadow-2xl`}>
+            className={`${color} h-30 relative flex flex-col items-center justify-center text-black font-bold rounded-lg border-2 border-white shadow-2xl`}
+            onClick={() => {
+                if (checkboxRef.current) {
+                    onSelect(checkboxRef.current)
+                }
+            }}>
             {isEditing ? (
                 <input
                     value={value}
@@ -85,19 +111,12 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
                 <input
                     className="w-6 h-6 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"
                     type={"checkbox"}
-                    onChange={(e) => {
-                        if (selectedMods.filter((f) => (f.variant !== variant)).length > 0) {
-                            e.target.checked = !e.target.checked;
-                            return;
-                        }
-                        switch (e.target.checked) {
-                            case true:
-                                addSelectedMod({variant, fileName, userName: modName})
-                                break;
-                            case false:
-                                removeSelectedMod({variant, fileName, userName: modName})
+                    onChange={() => {
+                        if (checkboxRef.current) {
+                            onSelect(checkboxRef.current)
                         }
                     }}
+                    ref={checkboxRef}
                 />
             </div>
             <div className="absolute top-2 left-2">
