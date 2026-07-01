@@ -13,25 +13,33 @@ function ModTab({variant, mods, loading}: { variant: ModTabVariant, mods: ModNam
     const {search, searchType} = useSearchStore();
     const [filteredMods, setFilteredMods] = useState<ModName[]>([]);
 
+
     useEffect(() => {
         let list: string[] = [];
         switch (searchType) {
-            case SearchType.FileName:
-                list = mods.map((m) => m.file_name)
+            case SearchType.FileName: {
+                const regex = /\d+/g;
+
+                const filteredMods = mods.filter(mod => {
+                    const num = parseInt(mod.file_name.match(regex)?.join("") ?? "");
+                    return !isNaN(num) && num.toString().includes(search);
+                });
+
+                setFilteredMods(filteredMods);
                 break;
-            case SearchType.UserName:
+            }
+            case SearchType.UserName: {
                 list = mods.map((m) => m.user_name)
-                break;
+                const fuse = new Fuse(list, {
+                    findAllMatches: true,
+                });
+
+                const result = fuse.search(search)
+
+                setFilteredMods(result.map(m => mods[m.refIndex]))
+                return;
+            }
         }
-        const fuse = new Fuse(list, {
-            findAllMatches: true,
-        });
-
-        const result = fuse.search(search)
-        const resultIndexes = result.map(m => m.refIndex)
-
-        setFilteredMods(resultIndexes.map(m => mods[m]))
-
     }, [search]);
 
     useEffect(() => {
