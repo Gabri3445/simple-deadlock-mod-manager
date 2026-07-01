@@ -13,7 +13,7 @@ function SearchBox({ref, style, setOpen}: { ref?: Ref<any>, style?: CSSPropertie
                 setPlaceholder("Enter name Here...")
                 break;
             case SearchType.FileName:
-                setPlaceholder("Enter file number here...")
+                setPlaceholder("Enter vpk file number here...")
                 break;
         }
     }, [searchType]);
