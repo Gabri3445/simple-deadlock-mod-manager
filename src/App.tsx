@@ -35,7 +35,7 @@ function App() {
     }
 
     return (
-        <main className="flex h-screen flex-col">
+        <main className="flex h-full flex-col">
             <TopBar/>
             <div className="flex flex-1 gap-4">
                 <DeleteModal />
