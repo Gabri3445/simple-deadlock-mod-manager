@@ -8,6 +8,8 @@
 
 A lightweight mod manager for **Deadlock**.
 
+**No AI has been used for this project.**
+
 ## Installation
 
 Go to the [Releases Page](https://github.com/Gabri3445/simple-deadlock-mod-manager/releases)
