@@ -53,7 +53,8 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
     return (
         <div
             className={`${color} h-30 relative flex flex-col items-center justify-center text-black font-bold rounded-lg border-3 border-white shadow-2xl`}
-            onClick={() => {
+            onClick={(e) => {
+                e.stopPropagation()
                 if (checkboxRef.current) {
                     onSelect(checkboxRef.current)
                 }
@@ -111,12 +112,14 @@ function Mod({modName, fileName, variant}: { modName: string, fileName: string, 
                 <input
                     className="w-6 h-6 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"
                     type={"checkbox"}
-                    onChange={() => {
+                    ref={checkboxRef}
+                    onClick={(e) => {
+                        e.stopPropagation()
                         if (checkboxRef.current) {
+                            checkboxRef.current.checked = !checkboxRef.current.checked;
                             onSelect(checkboxRef.current)
                         }
                     }}
-                    ref={checkboxRef}
                 />
             </div>
             <div className="absolute top-2 left-2">
