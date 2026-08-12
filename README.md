@@ -33,7 +33,7 @@ Go to the [Releases Page](https://github.com/Gabri3445/simple-deadlock-mod-manag
 
 #### Arch (using pacman/yay/paru)
 
-- Run `yay -S simple-deadlock-mod-manager` (pushes to the AUR are not allowed at the moment, please use the AppImage)
+- Run `yay -S simple-deadlock-mod-manager`
 - Or run `yay -S simple-deadlock-mod-manager-git` (outdated)
 
 #### All of the above and any other distro
